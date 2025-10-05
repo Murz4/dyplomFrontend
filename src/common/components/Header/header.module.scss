@@ -1,0 +1,11 @@
+.container {
+  background-color: #f9fff1;
+  padding: 28px 18px 22px 30px;
+  display: flex;
+  justify-content: space-between;
+
+  &__buttons {
+    display: flex;
+    gap: 6px;
+  }
+}

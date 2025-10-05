@@ -1,5 +1,6 @@
-import { AuthPage } from '@pages/authPage/authPage';
+import { AuthPage } from '@pages/AuthPage/AuthPage';
+import { MainPage } from '@pages/MainPage/MainPage';
 
-const App = () => <AuthPage />;
+const App = () => <MainPage />;
 
 export default App;
