@@ -7,7 +7,6 @@ import styles from './header.module.scss';
 
 export const Header = () => {
   const [isClosed, setIsClosed] = useState(true);
-  console.log(isClosed);
 
   return (
     <div className={styles.container}>
