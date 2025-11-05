@@ -7,7 +7,7 @@ import styles from './mainPage.module.scss';
 export const MainPage = () => (
   <div className={styles.container}>
     <div>
-      <img style={{ width: '100%', height: '100%', position: 'absolute', zIndex: 0 }} src={artBoardCenter} />
+      <img className={styles.container__img} src={artBoardCenter} />
       <div style={{ zIndex: 1, position: 'relative' }}>
         <Header />
       </div>
