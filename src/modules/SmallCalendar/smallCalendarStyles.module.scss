@@ -1,0 +1,77 @@
+.smallCalendar {
+  width: 248px;
+  height: 238px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  margin-bottom: 70px;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  margin-bottom: 6px;
+
+  button {
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    transition: 0.25s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 10px;
+  color: white;
+  margin-bottom: 4px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.day {
+  font-size: 10px;
+  color: #1f2937;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otherMonth {
+  opacity: 0.5;
+}
+
+.hasEvent {
+  background: #ffd257;
+  color: #000;
+  font-weight: 600;
+}
+
+.today {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+}
