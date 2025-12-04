@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Header } from '@common/components/Header/Header';
 import styles from './calendarPage.module.scss';
 import { Calendar } from '@modules/CalendarPage/Calendar/Calendar';
 import { SmallCalendar } from '@modules/SmallCalendar/SmallCalendar';

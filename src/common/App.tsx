@@ -5,7 +5,6 @@ import { setupInterceptors } from 'src/api/instances';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { MainPage } from '@pages/MainPage/MainPage';
 import { Layout } from '@pages/Layout/Layout';
-import { Calendar } from 'lucide-react';
 import { CalendarPage } from '@pages/CalendarPage/CalendarPage';
 import { TasksPage } from '@pages/TasksPage/TasksPage';
 

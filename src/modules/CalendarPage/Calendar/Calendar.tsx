@@ -1,12 +1,10 @@
-import { useState } from 'react';
-
 import styles from './calendarStyles.module.scss';
 
 //@ts-ignore
 
 export const Calendar = ({ currentDate, setCurrentDate }) => {
   // const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 1));
-  const [events, setEvents] = useState([
+  const events = [
     {
       date: '2025-11-26',
       title: 'Discuss the quarter',
@@ -48,22 +46,22 @@ export const Calendar = ({ currentDate, setCurrentDate }) => {
       badge: 'Deadline',
       icon: '✏️',
     },
-  ]);
-
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
   ];
+
+  // const months = [
+  //   'January',
+  //   'February',
+  //   'March',
+  //   'April',
+  //   'May',
+  //   'June',
+  //   'July',
+  //   'August',
+  //   'September',
+  //   'October',
+  //   'November',
+  //   'December',
+  // ];
   const weekDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   const getDaysInMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -71,8 +69,8 @@ export const Calendar = ({ currentDate, setCurrentDate }) => {
     const day = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
     return day === 0 ? 6 : day - 1;
   };
-  const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
-  const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+  // const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+  // const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
   const isToday = (day: number, month: number, year: number) => {
     const today = new Date();
     return day === today.getDate() && month === today.getMonth() && year === today.getFullYear();

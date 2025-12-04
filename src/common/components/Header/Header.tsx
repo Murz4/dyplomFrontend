@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Modal } from '@modules/main/Modal/Modal';
 
 import styles from './header.module.scss';
-import { CustomInput } from '../CustomInput/CustomInput';
 import { StepItem } from '../StepItem/StepItem';
 import { DropDown } from '../DropDown/DropDown';
 

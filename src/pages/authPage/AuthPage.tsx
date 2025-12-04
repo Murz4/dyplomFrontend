@@ -3,7 +3,7 @@ import ArtBoardBottom from '/artBoardBottom.png';
 import styles from './authPage.module.scss';
 import { CustomInput } from '@common/components/CustomInput/CustomInput';
 import { HeaderButton } from '@modules/header/HeaderButton/HeaderButton';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { Formik, Form, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { login } from '@common/store/slicer/userSlice';
@@ -45,7 +45,6 @@ const registrationValidationSchema = Yup.object({
 
 export const AuthPage = ({ mode }: IAuthPageProps) => {
   const [formState, setFormState] = useState<'login' | 'reg' | 'verify'>(mode);
-  const [registrationSuccess, setRegistrationSuccess] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const dispatch = useAppDispatch();
@@ -68,10 +67,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
     password: '',
   };
 
-  const handleLoginSubmit = async (
-    values: LoginFormValues,
-    { setSubmitting, setErrors }: FormikHelpers<LoginFormValues>
-  ) => {
+  const handleLoginSubmit = async (values: LoginFormValues, { setSubmitting }: FormikHelpers<LoginFormValues>) => {
     try {
       setSuccessMessage('');
       setErrorMessage('');
@@ -92,7 +88,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
   const handleRegistrationSubmit = async (
     values: RegistrationFormValues,
-    { setSubmitting, setErrors }: FormikHelpers<RegistrationFormValues>
+    { setSubmitting }: FormikHelpers<RegistrationFormValues>
   ) => {
     try {
       setSuccessMessage('');
