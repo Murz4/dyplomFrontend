@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux';
 import { store } from '@common/store/store';
-// import { AuthPage } from '../pages/AuthPage/AuthPage.tsx';
+import { AuthPage } from '@pages/AuthPage/AuthPage';
 import { setupInterceptors } from 'src/api/instances';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { MainPage } from '@pages/MainPage/MainPage';
@@ -19,18 +19,18 @@ const router = createBrowserRouter([
         index: true,
         element: <MainPage />,
       },
-      // {
-      //   path: 'login',
-      //   element: <AuthPage mode='login' />,
-      // },
-      // {
-      //   path: 'reg',
-      //   element: <AuthPage mode='reg' />,
-      // },
-      // {
-      //   path: 'verify',
-      //   element: <AuthPage mode='verify' />,
-      // },
+      {
+        path: 'login',
+        element: <AuthPage mode='login' />,
+      },
+      {
+        path: 'reg',
+        element: <AuthPage mode='reg' />,
+      },
+      {
+        path: 'verify',
+        element: <AuthPage mode='verify' />,
+      },
       {
         path: 'board',
         element: <CalendarPage />,
