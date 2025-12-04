@@ -1,6 +1,6 @@
 import { InputHTMLAttributes } from 'react';
 
-import styles from './CustomInput.module.scss';
+import styles from './customInput.module.scss';
 
 interface ICustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string | undefined;
