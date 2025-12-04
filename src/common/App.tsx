@@ -2,11 +2,11 @@ import { Provider } from 'react-redux';
 import { store } from '@common/store/store';
 import { setupInterceptors } from 'src/api/instances';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import { Layout } from 'src/pages/Layout/Layout';
-import { MainPage } from 'src/pages/MainPage/MainPage';
-import { AuthPage } from 'src/pages/AuthPage/AuthPage';
-import { CalendarPage } from 'src/pages/CalendarPage/CalendarPage';
-import { TasksPage } from 'src/pages/TasksPage/TasksPage';
+import { AuthPage } from '../pages/AuthPage/AuthPage';
+import { CalendarPage } from '../pages/CalendarPage/CalendarPage';
+import { TasksPage } from '../pages/TasksPage/TasksPage';
+import { Layout } from '../pages/Layout/Layout';
+import { MainPage } from '../pages/MainPage/MainPage';
 
 setupInterceptors(store);
 
