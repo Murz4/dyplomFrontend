@@ -2,7 +2,7 @@
   display: flex;
   padding: 0 5%;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 80px);
   background-color: #aadb1f;
   align-items: center;
   justify-content: center;
@@ -26,7 +26,7 @@
   }
 
   &__main {
-    padding: 50px 2.5rem 50px 2.5rem;
+    padding: 50px 2rem 50px 2rem;
     width: 100%;
     max-width: 500px;
     background-color: #f9fff1;
@@ -51,6 +51,12 @@
     font-size: 20px;
     color: #00143180;
     text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #001431;
+    }
   }
 
   &__buttonsWrapper {
@@ -77,44 +83,147 @@
     width: 100%;
     max-width: 280px;
   }
+
+  &__registrationTitle {
+    text-align: center;
+    font-size: 37px;
+    font-weight: 700;
+    color: rgba(0, 20, 49, 0.7);
+  }
+
+  &__registrationUpperInputs {
+    display: flex;
+    gap: 20px;
+  }
+
+  &__mainRegContent {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__regButton {
+    height: 65px;
+    width: 100%;
+    max-width: 280px;
+    align-self: center;
+  }
+
+  &__errorText {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-left: 5px;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  &__errorMessage {
+    background-color: #ffebee;
+    border: 1px solid #e74c3c;
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #c62828;
+    font-size: 16px;
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  &__successMessage {
+    background-color: #e8f5e9;
+    border: 1px solid #4caf50;
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #2e7d32;
+    font-size: 16px;
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  &__switchForm {
+    text-align: center;
+    font-size: 16px;
+    color: #00143180;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin-top: 10px;
+
+    &:hover {
+      color: #001431;
+    }
+  }
+
+  &__verifyMain {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 44px;
+  }
+
+  &__verifyTextWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  &__verifyTitle {
+    font-size: 35px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  &__verifyText {
+    text-align: center;
+    font-size: 20px;
+  }
 }
 
-// @media (max-width: 1280px) {
-//   .container {
-//     &__main {
-//       width: 400px;
-//     }
-//   }
-// }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-// @media (max-width: 768px) {
-//   .container {
-//     &__main {
-//       width: 350px;
-//     }
-//     &__loginButton {
-//       height: 40px;
-//       width: 200px;
-//     }
-//     &__signupButton {
-//       height: 40px;
-//       width: 230px;
-//     }
-//   }
-// }
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 @media (max-width: 420px) {
   .container {
     &__main {
       padding: 50px 1rem 50px 1rem;
     }
-    //  &__loginButton {
-    //    height: 35px;
-    //    width: 150px;
-    //  }
-    //  &__signupButton {
-    //    height: 35px;
-    //    width: 180px;
-    //  }
+
+    &__registrationTitle {
+      font-size: 28px;
+    }
+
+    &__registrationUpperInputs {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    &__errorText {
+      font-size: 12px;
+    }
+
+    &__errorMessage,
+    &__successMessage {
+      font-size: 14px;
+      padding: 10px 12px;
+    }
   }
 }

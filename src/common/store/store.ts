@@ -1,20 +1,18 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import userReducer from './slicer/userSlice';
+import registerReducer from './slicer/registrationSlice';
 
-// import emotionEquipReducer from './slicer/emotionEquipSlice';
-
-const reducer = combineReducers({
-  // emotionEquip: emotionEquipReducer,
+const rootReducer = combineReducers({
+  user: userReducer,
+  register: registerReducer,
 });
 
-export type RootState = ReturnType<typeof reducer>;
-
 export const store = configureStore({
-  reducer,
+  reducer: rootReducer,
   middleware: getDefaultMiddleware => getDefaultMiddleware(),
 });
 
-export type AppStore = typeof store;
-export type AppDispatch = AppStore['dispatch'];
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
-export { useAppDispatch, useAppSelector } from './hooks.ts';
 export default store;

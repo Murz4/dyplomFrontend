@@ -9,7 +9,6 @@ export const CalendarPage = () => {
 
   return (
     <div className={styles.container}>
-      <Header />
       <div className={styles.container__main}>
         <div className={styles.container__smallCalendar}>
           <SmallCalendar currentDate={currentDate} setCurrentDate={setCurrentDate} />

@@ -1,0 +1,39 @@
+.container {
+  height: calc(100vh - 80px);
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 40px;
+  background-color: #e1a0a6;
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 92%;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    overflow: auto;
+    background:
+      url('/public/backgroundTasks.png'),
+      linear-gradient(90deg, rgba(249, 187, 6, 1), rgba(250, 119, 10, 1), rgba(249, 8, 33, 1));
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+
+  &__mainHeader {
+    width: 100%;
+    background-color: white;
+    height: 64px;
+  }
+
+  &__wrapperContent {
+    flex: 1;
+    overflow: auto;
+    padding: 70px 0 70px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+}
