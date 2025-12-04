@@ -25,7 +25,7 @@
       "@common/*": ["./src/common/*"],
       "@modules/*": ["./src/modules/*"],
       "@pages/*": ["./src/pages/*"],
-      "@stylesheets/*": ["./src/stylesheets//*"]
+      "@stylesheets/*": ["./src/stylesheets/*"]
     },
     "types": ["vite/client"]
   },
