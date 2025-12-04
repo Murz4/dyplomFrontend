@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux';
 import { store } from '@common/store/store';
-import { AuthPage } from '@pages/AuthPage/AuthPage';
+import { AuthPage } from '@pages/AuthPage/AuthPage.tsx';
 import { setupInterceptors } from 'src/api/instances';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { MainPage } from '@pages/MainPage/MainPage';
