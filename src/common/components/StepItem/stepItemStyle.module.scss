@@ -1,0 +1,17 @@
+.stepItem {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+
+  &__line {
+    flex: 1;
+    height: 4px;
+    background: rgba(199, 207, 230, 0.3);
+    border-radius: 2px;
+    transition: background 0.3s ease;
+
+    &_active {
+      background: #095dd8;
+    }
+  }
+}

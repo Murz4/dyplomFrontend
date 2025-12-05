@@ -4,11 +4,13 @@ import { ChevronDown } from 'lucide-react';
 
 interface DropdownBlockProps {
   title?: string;
-  children?: React.ReactNode;
+  children?: React.ReactNode | ((close: () => void) => React.ReactNode);
 }
 
 export const DropDown: React.FC<DropdownBlockProps> = ({ title = 'Select', children }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const closeDropdown = () => setIsOpen(false);
 
   return (
     <div className={`${styles.dropdown} ${isOpen ? styles.open : ''}`}>
@@ -18,7 +20,9 @@ export const DropDown: React.FC<DropdownBlockProps> = ({ title = 'Select', child
       </button>
 
       <div className={`${styles.dropdown__content} ${isOpen ? styles.dropdown__content_open : ''}`}>
-        <div className={styles.dropdown__inner}>{children ?? <p>Dropdown content...</p>}</div>
+        <div className={styles.dropdown__inner}>
+          {typeof children === 'function' ? children(closeDropdown) : (children ?? <p>Dropdown content...</p>)}
+        </div>
       </div>
     </div>
   );
