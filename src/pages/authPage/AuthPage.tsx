@@ -314,7 +314,14 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 <img src='/verifySuccessImage.svg' />
                 <HeaderButton
                   onClick={() => navigate('/login', { replace: true })}
-                  style={{ height: 79, marginTop: 41, maxWidth: 326, fontSize: 28, fontWeight: 'bold' }}
+                  style={{
+                    height: 79,
+                    marginTop: 41,
+                    maxWidth: 326,
+                    fontSize: 28,
+                    fontWeight: 'bold',
+                    borderRadius: 25,
+                  }}
                 >
                   Back to login
                 </HeaderButton>
@@ -329,7 +336,14 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 </div>
                 <HeaderButton
                   onClick={() => navigate('/reg', { replace: true })}
-                  style={{ height: 79, marginTop: 41, maxWidth: 326, fontSize: 28, fontWeight: 'bold' }}
+                  style={{
+                    height: 79,
+                    marginTop: 41,
+                    maxWidth: 326,
+                    fontSize: 28,
+                    fontWeight: 'bold',
+                    borderRadius: 25,
+                  }}
                 >
                   Back to registration
                 </HeaderButton>
