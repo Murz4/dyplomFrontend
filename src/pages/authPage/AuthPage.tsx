@@ -62,6 +62,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
   }, [mode]);
 
   useEffect(() => {
+    console.log('token:', token);
     if (formState === 'verifed-email' && token) {
       const verifyEmail = async () => {
         try {
@@ -70,6 +71,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
               token: token,
             },
           });
+          console.log('response:', response.data);
 
           if (response.data.success) {
             setIsVerified(true);
