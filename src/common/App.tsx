@@ -32,8 +32,8 @@ const router = createBrowserRouter([
         element: <AuthPage mode='verify' />,
       },
       {
-        path: 'verifed-email',
-        element: <AuthPage mode='verifed-email' />,
+        path: 'verified-email',
+        element: <AuthPage mode='verified-email' />,
       },
       {
         path: 'board',

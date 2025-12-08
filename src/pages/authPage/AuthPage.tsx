@@ -25,7 +25,7 @@ interface RegistrationFormValues {
 }
 
 interface IAuthPageProps {
-  mode: 'login' | 'reg' | 'verify' | 'verifed-email';
+  mode: 'login' | 'reg' | 'verify' | 'verified-email';
 }
 
 const loginValidationSchema = Yup.object({
@@ -50,7 +50,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
 
-  const [formState, setFormState] = useState<'login' | 'reg' | 'verify' | 'verifed-email'>(mode);
+  const [formState, setFormState] = useState<'login' | 'reg' | 'verify' | 'verified-email'>(mode);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const dispatch = useAppDispatch();
@@ -63,7 +63,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
   useEffect(() => {
     console.log('token:', token);
-    if (formState === 'verifed-email' && token) {
+    if (formState === 'verified-email' && token) {
       const verifyEmail = async () => {
         try {
           const response = await apiClient.get('/user/activate', {
@@ -73,7 +73,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
           });
           console.log('response:', response.data);
 
-          if (response.data.success) {
+          if (response.data) {
             setIsVerified(true);
           } else {
             setIsVerified(false);
@@ -128,16 +128,14 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
       const full_name: string = `${values.name}${values.surname}`;
 
-      await dispatch(register({ full_name: full_name, email: values.email, password: values.password }));
+      await dispatch(register({ full_name: full_name, email: values.email, password: values.password })).unwrap();
 
       console.log('Registration values:', values);
       setSuccessMessage('Registration successful!');
-      navigate('/verify');
 
-      setTimeout(() => setSuccessMessage(''), 3000);
+      navigate('/verify');
     } catch (error: any) {
-      setErrorMessage(error?.message || 'An error occurred during registration');
-      setTimeout(() => setErrorMessage(''), 5000);
+      setErrorMessage(error?.message || 'An error occurred during login');
     } finally {
       setSubmitting(false);
     }
