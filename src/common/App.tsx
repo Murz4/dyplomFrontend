@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         path: 'login',
         element: (
           <PublicRoute>
-            <AuthPage mode='login' />{' '}
+            <AuthPage mode='login' />
           </PublicRoute>
         ),
       },

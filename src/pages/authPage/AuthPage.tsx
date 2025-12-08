@@ -314,7 +314,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 <img src='/verifySuccessImage.svg' />
                 <HeaderButton
                   onClick={() => navigate('/login', { replace: true })}
-                  style={{ height: 79, marginTop: 41 }}
+                  style={{ height: 79, marginTop: 41, maxWidth: 326, fontSize: 28, fontWeight: 'bold' }}
                 >
                   Back to login
                 </HeaderButton>
@@ -327,7 +327,10 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                   <p className={styles.container__verifyTitle}>Verification Failed ❌</p>
                   <p className={styles.container__verifyText}>The verification link is invalid or expired.</p>
                 </div>
-                <HeaderButton onClick={() => navigate('/reg', { replace: true })} style={{ height: 79, marginTop: 41 }}>
+                <HeaderButton
+                  onClick={() => navigate('/reg', { replace: true })}
+                  style={{ height: 79, marginTop: 41, maxWidth: 326, fontSize: 28, fontWeight: 'bold' }}
+                >
                   Back to registration
                 </HeaderButton>
               </div>
