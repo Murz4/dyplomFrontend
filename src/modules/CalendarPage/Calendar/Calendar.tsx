@@ -153,7 +153,6 @@ export const Calendar = ({ currentDate, setCurrentDate }) => {
     for (let day = 1; day <= daysInMonth; day++) {
       const dayEvents = getEventsForDay(day, currentDate.getMonth(), currentDate.getFullYear());
       const isCurrentDay = isToday(day, currentDate.getMonth(), currentDate.getFullYear());
-      console.log(isCurrentDay, 'her');
       days.push(
         <div key={day} className={`${styles['custom-calendar__grid-day']} ${isCurrentDay ? styles.today : ''}`}>
           <div className={styles['custom-calendar__day-number']}>{day}</div>

@@ -3,13 +3,14 @@ import ArtBoardBottom from '/artBoardBottom.png';
 import styles from './authPage.module.scss';
 import { CustomInput } from '@common/components/CustomInput/CustomInput';
 import { HeaderButton } from '@modules/header/HeaderButton/HeaderButton';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { Formik, Form, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { login } from '@common/store/slicer/userSlice';
 import { useAppDispatch } from '@common/store/hooks';
 import { register } from '@common/store/slicer/registrationSlice';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
+import apiClient from 'src/api/instances';
 
 interface LoginFormValues {
   email: string;
@@ -24,7 +25,7 @@ interface RegistrationFormValues {
 }
 
 interface IAuthPageProps {
-  mode: 'login' | 'reg' | 'verify';
+  mode: 'login' | 'reg' | 'verify' | 'verifed-email';
 }
 
 const loginValidationSchema = Yup.object({
@@ -44,7 +45,12 @@ const registrationValidationSchema = Yup.object({
 });
 
 export const AuthPage = ({ mode }: IAuthPageProps) => {
-  const [formState, setFormState] = useState<'login' | 'reg' | 'verify'>(mode);
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
+
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+
+  const [formState, setFormState] = useState<'login' | 'reg' | 'verify' | 'verifed-email'>(mode);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const dispatch = useAppDispatch();
@@ -54,6 +60,30 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
     setFormState(mode);
     console.log(mode);
   }, [mode]);
+
+  useEffect(() => {
+    if (formState === 'verifed-email' && token) {
+      const verifyEmail = async () => {
+        try {
+          const response = await apiClient.get('/user/activate', {
+            params: {
+              token: token,
+            },
+          });
+
+          if (response.data.success) {
+            setIsVerified(true);
+          } else {
+            setIsVerified(false);
+          }
+        } catch (error) {
+          setIsVerified(false);
+        }
+      };
+
+      verifyEmail();
+    }
+  }, [formState, token]);
 
   const loginInitialValues: LoginFormValues = {
     email: '',
@@ -272,14 +302,26 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       ) : (
         <div className={styles.container__main}>
           <div className={styles.container__verifyMain}>
-            <div className={styles.container__verifyTextWrapper}>
-              <p className={styles.container__verifyTitle}>Email Verified</p>
-              <p className={styles.container__verifyText}>
-                Your email address has been successfully verified. You can now continue using your account without any
-                restrictions.
-              </p>
-            </div>
-            <img style={{ marginRight: 10 }} src='/public/verifySuccessImage.svg' />
+            {isVerified === null && <p className={styles.container__verifyText}>Checking verification...</p>}
+
+            {isVerified === true && (
+              <>
+                <div className={styles.container__verifyTextWrapper}>
+                  <p className={styles.container__verifyTitle}>Email Verified ✅</p>
+                  <p className={styles.container__verifyText}>Your email address has been successfully verified.</p>
+                </div>
+                <img src='/public/verifySuccessImage.svg' />
+              </>
+            )}
+
+            {isVerified === false && (
+              <>
+                <div className={styles.container__verifyTextWrapper}>
+                  <p className={styles.container__verifyTitle}>Verification Failed ❌</p>
+                  <p className={styles.container__verifyText}>The verification link is invalid or expired.</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
