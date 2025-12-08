@@ -5,6 +5,7 @@ interface UserState {
   access: string | null;
   refresh: string | null;
   userInfo: Record<string, any> | null;
+  isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
 }
@@ -13,6 +14,7 @@ const initialState: UserState = {
   access: null,
   refresh: null,
   userInfo: null,
+  isAuthenticated: false,
   loading: false,
   error: null,
 };
@@ -21,12 +23,8 @@ export const login = createAsyncThunk(
   'user/login',
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
-      console.log(1);
       const response = await apiClient.post('/user/login', credentials);
-      const tokens = response.data; // { access, refresh }
-      console.log(tokens, 'asdsadsad');
-      console.log(response, 'lolol');
-      return { ...tokens };
+      return response.data; // { access, refresh, userInfo }
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Login failed');
     }
@@ -57,6 +55,7 @@ export const userSlice = createSlice({
       state.access = null;
       state.refresh = null;
       state.userInfo = null;
+      state.isAuthenticated = false;
     },
   },
   extraReducers: builder => {
@@ -72,17 +71,21 @@ export const userSlice = createSlice({
           state.access = action.payload.access;
           state.refresh = action.payload.refresh;
           state.userInfo = action.payload.userInfo;
+          state.isAuthenticated = true;
         }
       )
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
+        state.isAuthenticated = false;
       })
       .addCase(refreshAccessToken.fulfilled, (state, action: PayloadAction<{ access: string }>) => {
         state.access = action.payload.access;
+        state.isAuthenticated = true;
       })
       .addCase(refreshAccessToken.rejected, (state, action: PayloadAction<any>) => {
         state.error = action.payload;
+        state.isAuthenticated = false;
       });
   },
 });

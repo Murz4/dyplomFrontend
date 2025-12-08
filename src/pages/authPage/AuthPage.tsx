@@ -108,8 +108,9 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
       console.log('Login values:', values);
       setSuccessMessage('You have successfully logged in!');
-
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
     } catch (error: any) {
       setErrorMessage(error?.message || 'An error occurred during login');
       setTimeout(() => setErrorMessage(''), 5000);
@@ -296,7 +297,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 link to proceed.
               </p>
             </div>
-            <img style={{ marginRight: 10 }} src='/public/verifyImage.svg' />
+            <img style={{ marginRight: 10 }} src='/verifyImage.svg' />
           </div>
         </div>
       ) : (
@@ -305,22 +306,31 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
             {isVerified === null && <p className={styles.container__verifyText}>Checking verification...</p>}
 
             {isVerified === true && (
-              <>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles.container__verifyTextWrapper}>
                   <p className={styles.container__verifyTitle}>Email Verified ✅</p>
                   <p className={styles.container__verifyText}>Your email address has been successfully verified.</p>
                 </div>
-                <img src='/public/verifySuccessImage.svg' />
-              </>
+                <img src='/verifySuccessImage.svg' />
+                <HeaderButton
+                  onClick={() => navigate('/login', { replace: true })}
+                  style={{ height: 79, marginTop: 41 }}
+                >
+                  Back to login
+                </HeaderButton>
+              </div>
             )}
 
             {isVerified === false && (
-              <>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles.container__verifyTextWrapper}>
                   <p className={styles.container__verifyTitle}>Verification Failed ❌</p>
                   <p className={styles.container__verifyText}>The verification link is invalid or expired.</p>
                 </div>
-              </>
+                <HeaderButton onClick={() => navigate('/reg', { replace: true })} style={{ height: 79, marginTop: 41 }}>
+                  Back to registration
+                </HeaderButton>
+              </div>
             )}
           </div>
         </div>

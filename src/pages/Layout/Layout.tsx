@@ -1,11 +1,16 @@
 import { Header } from '@common/components/Header/Header';
 import { Outlet } from 'react-router';
+import { useAppSelector } from '@common/store/hooks';
 
-export const Layout = () => (
-  <div>
-    <Header />
+export const Layout = () => {
+  const isAuthenticated = useAppSelector(state => state.user.isAuthenticated);
+
+  return (
     <div>
-      <Outlet />
+      {isAuthenticated && <Header />}
+      <div>
+        <Outlet />
+      </div>
     </div>
-  </div>
-);
+  );
+};
