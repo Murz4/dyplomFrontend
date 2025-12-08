@@ -314,7 +314,13 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 <img src='/verifySuccessImage.svg' />
                 <HeaderButton
                   onClick={() => {
-                    window.location.replace('/login');
+                    window.history.pushState(null, '', '/login');
+                    window.history.replaceState(null, '', '/login');
+                    navigate('/login', { replace: true });
+
+                    window.addEventListener('popstate', () => {
+                      window.history.pushState(null, '', '/login');
+                    });
                   }}
                   style={{
                     height: 79,
@@ -338,7 +344,9 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 </div>
                 <HeaderButton
                   onClick={() => {
-                    window.location.replace('/reg');
+                    window.history.pushState(null, '', '/reg');
+                    window.history.replaceState(null, '', '/reg');
+                    navigate('/reg', { replace: true });
                   }}
                   style={{
                     height: 79,
