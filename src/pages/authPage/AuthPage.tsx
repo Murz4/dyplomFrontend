@@ -313,15 +313,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 </div>
                 <img src='/verifySuccessImage.svg' />
                 <HeaderButton
-                  onClick={() => {
-                    window.history.pushState(null, '', '/login');
-                    window.history.replaceState(null, '', '/login');
-                    navigate('/login', { replace: true });
-
-                    window.addEventListener('popstate', () => {
-                      window.history.pushState(null, '', '/login');
-                    });
-                  }}
+                  onClick={() => navigate('/login', { replace: true })}
                   style={{
                     height: 79,
                     marginTop: 41,
@@ -343,11 +335,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                   <p className={styles.container__verifyText}>The verification link is invalid or expired.</p>
                 </div>
                 <HeaderButton
-                  onClick={() => {
-                    window.history.pushState(null, '', '/reg');
-                    window.history.replaceState(null, '', '/reg');
-                    navigate('/reg', { replace: true });
-                  }}
+                  onClick={() => navigate('/reg', { replace: true })}
                   style={{
                     height: 79,
                     marginTop: 41,
