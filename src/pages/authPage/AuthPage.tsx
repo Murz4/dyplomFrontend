@@ -300,9 +300,9 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                     )}
                   </div>
 
-                  <a onClick={() => navigate('/change-password')} className={styles.container__forgotPassword}>
+                  <p onClick={() => navigate('/change-password')} className={styles.container__forgotPassword}>
                     Forgot your password?
-                  </a>
+                  </p>
                 </div>
 
                 {successMessage && <div className={styles.container__successMessage}>{successMessage}</div>}
@@ -398,7 +398,11 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                   </HeaderButton>
                 </div>
 
-                <p className={styles.container__switchForm} onClick={() => navigate('/login')}>
+                <p
+                  style={{ maxWidth: 'fit-content', alignSelf: 'center' }}
+                  className={styles.container__switchForm}
+                  onClick={() => navigate('/login')}
+                >
                   Already have an account? Log In
                 </p>
               </Form>
