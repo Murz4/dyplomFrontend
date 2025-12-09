@@ -11,10 +11,10 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  access: null,
-  refresh: null,
-  userInfo: null,
-  isAuthenticated: false,
+  access: localStorage.getItem('access') || null,
+  refresh: localStorage.getItem('refresh') || null,
+  userInfo: localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')!) : null,
+  isAuthenticated: !!localStorage.getItem('access'),
   loading: false,
   error: null,
 };
@@ -24,7 +24,15 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
       const response = await apiClient.post('/user/login', credentials);
-      return response.data; // { access, refresh, userInfo }
+      const tokens = response.data; // { access, refresh, userInfo }
+
+      localStorage.setItem('access', tokens.access);
+      localStorage.setItem('refresh', tokens.refresh);
+      if (tokens.userInfo) {
+        localStorage.setItem('userInfo', JSON.stringify(tokens.userInfo));
+      }
+
+      return { ...tokens };
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Login failed');
     }
@@ -41,6 +49,9 @@ export const refreshAccessToken = createAsyncThunk('user/refreshToken', async (_
     }
 
     const response = await apiClient.post('/user/refresh-token', { refresh });
+
+    localStorage.setItem('access', response.data.access);
+
     return response.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.response?.data?.message || 'Token refresh failed');
@@ -56,6 +67,10 @@ export const userSlice = createSlice({
       state.refresh = null;
       state.userInfo = null;
       state.isAuthenticated = false;
+
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      localStorage.removeItem('userInfo');
     },
   },
   extraReducers: builder => {
@@ -86,6 +101,13 @@ export const userSlice = createSlice({
       .addCase(refreshAccessToken.rejected, (state, action: PayloadAction<any>) => {
         state.error = action.payload;
         state.isAuthenticated = false;
+
+        state.access = null;
+        state.refresh = null;
+        state.userInfo = null;
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('userInfo');
       });
   },
 });

@@ -1,10 +1,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import userReducer from './slicer/userSlice';
 import registerReducer from './slicer/registrationSlice';
+import forgotPasswordReducer from './slicer/forgotPasswordSlice';
 
 const rootReducer = combineReducers({
   user: userReducer,
   register: registerReducer,
+  forgotPassword: forgotPasswordReducer,
 });
 
 export const store = configureStore({

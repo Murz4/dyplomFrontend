@@ -58,6 +58,18 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: 'change-password',
+        element: <AuthPage mode='change-password' />,
+      },
+      {
+        path: 'create-new-password',
+        element: <AuthPage mode='create-new-password' />,
+      },
+      {
+        path: 'password-changed',
+        element: <AuthPage mode='password-changed' />,
+      },
+      {
         path: 'board',
         element: (
           <ProtectedRoute>
