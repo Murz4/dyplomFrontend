@@ -4,7 +4,6 @@ import apiClient from 'src/api/instances';
 interface UserState {
   access: string | null;
   refresh: string | null;
-  userInfo: Record<string, any> | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
@@ -13,7 +12,6 @@ interface UserState {
 const initialState: UserState = {
   access: localStorage.getItem('access') || null,
   refresh: localStorage.getItem('refresh') || null,
-  userInfo: localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')!) : null,
   isAuthenticated: !!localStorage.getItem('access'),
   loading: false,
   error: null,
@@ -24,15 +22,12 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
       const response = await apiClient.post('/user/login', credentials);
-      const tokens = response.data; // { access, refresh, userInfo }
+      const { access_token, refresh_token } = response.data;
 
-      localStorage.setItem('access', tokens.access);
-      localStorage.setItem('refresh', tokens.refresh);
-      if (tokens.userInfo) {
-        localStorage.setItem('userInfo', JSON.stringify(tokens.userInfo));
-      }
+      localStorage.setItem('access', access_token);
+      localStorage.setItem('refresh', refresh_token);
 
-      return { ...tokens };
+      return { access_token, refresh_token };
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Login failed');
     }
@@ -52,8 +47,15 @@ export const refreshAccessToken = createAsyncThunk('user/refreshToken', async (_
 
     localStorage.setItem('access', response.data.access);
 
+    if (response.data.refresh) {
+      localStorage.setItem('refresh', response.data.refresh);
+    }
+
     return response.data;
   } catch (error: any) {
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+
     return thunkAPI.rejectWithValue(error.response?.data?.message || 'Token refresh failed');
   }
 });
@@ -65,12 +67,10 @@ export const userSlice = createSlice({
     logout(state) {
       state.access = null;
       state.refresh = null;
-      state.userInfo = null;
       state.isAuthenticated = false;
 
       localStorage.removeItem('access');
       localStorage.removeItem('refresh');
-      localStorage.removeItem('userInfo');
     },
   },
   extraReducers: builder => {
@@ -79,35 +79,33 @@ export const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        login.fulfilled,
-        (state, action: PayloadAction<{ access: string; refresh: string; userInfo: Record<string, any> }>) => {
-          state.loading = false;
-          state.access = action.payload.access;
-          state.refresh = action.payload.refresh;
-          state.userInfo = action.payload.userInfo;
-          state.isAuthenticated = true;
-        }
-      )
+      .addCase(login.fulfilled, (state, action: PayloadAction<{ access_token: string; refresh_token: string }>) => {
+        const { access_token, refresh_token } = action.payload;
+        state.loading = false;
+        state.access = access_token;
+        state.refresh = refresh_token;
+        state.isAuthenticated = true;
+      })
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
         state.isAuthenticated = false;
       })
-      .addCase(refreshAccessToken.fulfilled, (state, action: PayloadAction<{ access: string }>) => {
+      .addCase(refreshAccessToken.fulfilled, (state, action: PayloadAction<{ access: string; refresh?: string }>) => {
         state.access = action.payload.access;
+
+        if (action.payload.refresh) {
+          state.refresh = action.payload.refresh;
+        }
         state.isAuthenticated = true;
       })
       .addCase(refreshAccessToken.rejected, (state, action: PayloadAction<any>) => {
         state.error = action.payload;
         state.isAuthenticated = false;
-
         state.access = null;
         state.refresh = null;
-        state.userInfo = null;
         localStorage.removeItem('access');
         localStorage.removeItem('refresh');
-        localStorage.removeItem('userInfo');
       });
   },
 });

@@ -20,4 +20,29 @@
     color: black;
     font-weight: 600;
   }
+  &__participantsScroll {
+    margin-top: 10px;
+    max-height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c7cfe6;
+      border-radius: 10px;
+
+      &:hover {
+        background: #b8c0dd;
+      }
+    }
+  }
 }

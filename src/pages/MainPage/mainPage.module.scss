@@ -2,27 +2,201 @@
   width: 100%;
   height: calc(100vh - 80px);
   background-color: #ffb600;
-  overflow: hidden !important;
+  overflow: auto;
   position: relative;
+  background-image: url('/public/artBoardMain.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 51px;
+  padding: 84px 15px 15px 15px;
 
-  &__img {
-    width: 100% !important;
-    height: 100% !important;
-    position: absolute !important;
-    z-index: 0 !important;
+  &__leftSide {
+    height: 229px;
+    width: 199px;
+    background-color: white;
+    border-radius: 25px;
   }
 
-  @media (max-width: 768px) {
-    .container {
-      &__img {
-        // width: unset !important;
-        // height: unset !important;
-        // max-width: 100% !important;
-        // max-height: 100% !important;
-        // object-fit: cover;
-        // top: 30%;
-        display: none;
-      }
-    }
+  &__main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 771px;
+    gap: 8px;
+  }
+
+  &__headerMain {
+    width: 100%;
+    height: 73px;
+    border-radius: 25px;
+    border-width: 0px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 28px 0px 23px;
+  }
+
+  &__text {
+    font-size: 20px;
+    font-weight: bold;
+  }
+}
+
+.emptyState {
+  background-color: white;
+  border-radius: 25px;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 400px;
+}
+
+.emptyIcon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  opacity: 0.7;
+}
+
+.emptyTitle {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.emptyDescription {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 32px;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.createButton {
+  background-color: #ffb600;
+  color: #333;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 182, 0, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 182, 0, 0.4);
+    background-color: #ffc520;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.plusIcon {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.loadingState {
+  background-color: white;
+  border-radius: 25px;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #ffb600;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  font-size: 18px;
+  color: #666;
+  font-weight: 500;
+}
+
+.errorState {
+  background-color: white;
+  border-radius: 25px;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 400px;
+}
+
+.errorIcon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.errorTitle {
+  font-size: 24px;
+  font-weight: bold;
+  color: #d32f2f;
+  margin-bottom: 12px;
+}
+
+.errorMessage {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 32px;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.retryButton {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
+    background-color: #c62828;
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
