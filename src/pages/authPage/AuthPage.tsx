@@ -236,6 +236,8 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
     values: NewPasswordFormValues,
     { setSubmitting }: FormikHelpers<NewPasswordFormValues>
   ) => {
+    console.log('password', values.password);
+
     try {
       setSuccessMessage('Password has been changed');
       setErrorMessage('');
@@ -255,7 +257,6 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       setTimeout(() => setErrorMessage(''), 5000);
     } finally {
       setSubmitting(false);
-      console.log(values.password);
     }
   };
 
