@@ -223,7 +223,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
       setTimeout(() => {
         navigate('/login');
-      }, 3000);
+      }, 2000);
     } catch (error: any) {
       setErrorMessage(error?.message || 'An error occurred while sending reset instructions');
       setTimeout(() => setErrorMessage(''), 5000);
@@ -251,7 +251,9 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       console.log('Password reset response:', response.data);
 
       if (response.data) {
-        navigate('/login');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       }
     } catch (error: any) {
       setErrorMessage(error?.message || 'An error occurred while resetting password');
