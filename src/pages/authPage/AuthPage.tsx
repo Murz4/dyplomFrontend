@@ -243,7 +243,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       setSuccessMessage('Password has been changed');
       setErrorMessage('');
 
-      const response = await apiClient.post('/user/reset-password', {
+      const response = await apiClient.post('/user/reset-password-by-token', {
         token: token,
         password: values.password,
       });
