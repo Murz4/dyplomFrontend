@@ -130,7 +130,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
     const validateResetToken = async () => {
       try {
         const response = await apiClient.get('/user/reset_password', {
-          params: { token },
+          params: { token_str },
         });
 
         console.log('Token validation response:', response.data);
