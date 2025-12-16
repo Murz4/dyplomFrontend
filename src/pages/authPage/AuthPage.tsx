@@ -240,7 +240,6 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
     console.log('password', token);
 
     try {
-      setSuccessMessage('Password has been changed');
       setErrorMessage('');
 
       const response = await apiClient.post('/user/reset-password-by-token', {
@@ -249,7 +248,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       });
 
       console.log('Password reset response:', response.data);
-
+      setSuccessMessage('Password has been changed');
       if (response.data) {
         setTimeout(() => {
           navigate('/login');
