@@ -237,6 +237,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
     { setSubmitting }: FormikHelpers<NewPasswordFormValues>
   ) => {
     console.log('password', values.password);
+    console.log('password', token);
 
     try {
       setSuccessMessage('Password has been changed');
