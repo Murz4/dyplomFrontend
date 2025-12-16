@@ -223,7 +223,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
       setTimeout(() => {
         navigate('/login');
-      }, 2000);
+      }, 500);
     } catch (error: any) {
       setErrorMessage(error?.message || 'An error occurred while sending reset instructions');
       setTimeout(() => setErrorMessage(''), 5000);
@@ -252,7 +252,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
         setSuccessMessage('Password has been changed');
         setTimeout(() => {
           navigate('/login');
-        }, 2000);
+        }, 500);
       }
     } catch (error: any) {
       setErrorMessage(error?.message || 'An error occurred while resetting password');
@@ -522,6 +522,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                         />
+                        {successMessage && <div className={styles.container__successMessage}>{successMessage}</div>}
                         {errors.confirmPassword && touched.confirmPassword && (
                           <p className={styles.container__errorText}>{errors.confirmPassword}</p>
                         )}
