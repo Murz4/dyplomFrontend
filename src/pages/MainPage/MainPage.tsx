@@ -3,11 +3,16 @@ import styles from './mainPage.module.scss';
 import { ProjectComponent } from '@modules/main/ProjectComponent/ProjectComponent';
 import { useAppDispatch, useAppSelector } from '@common/store/hooks';
 import { getProjects } from '@common/store/slicer/getProjectsSlice';
+import { ParticipantsModal } from '@modules/main/ProjectModal/ParticipantsModal';
+import { getProjectMembers } from 'src/api/getProjectMembers';
 
 export const MainPage = () => {
   const [error, setError] = useState<string | null>(null);
+  const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+  const [loadingMembers, setLoadingMembers] = useState(false);
   const projects = useAppSelector(state => state.projects);
   const dispatch = useAppDispatch();
+  const [participants, setParticipants] = useState([]);
 
   useLayoutEffect(() => {
     const fetchProjects = async () => {
@@ -17,7 +22,6 @@ export const MainPage = () => {
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching projects:', err);
-      } finally {
       }
     };
 
@@ -28,13 +32,27 @@ export const MainPage = () => {
     console.log(index);
   };
 
+  const handleClickParticipants = async (index: number) => {
+    setLoadingMembers(true);
+    setShowParticipantsModal(true);
+    try {
+      const membersArray = await getProjectMembers(index);
+      console.log(index);
+      setParticipants(membersArray);
+    } catch (error) {
+      console.error('Error loading members:', error.message);
+      setParticipants([]);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
   if (projects.loading) {
     return (
       <div className={styles.container}>
-        <div className={styles.container__leftSide} />
         <div className={styles.container__main}>
           <div className={styles.container__headerMain}>
-            <p className={styles.container__text}>Recent projects</p>
+            <p className={styles.container__text}>Projects</p>
           </div>
           <div className={styles.loadingState}>
             <div className={styles.spinner} />
@@ -48,10 +66,9 @@ export const MainPage = () => {
   if (error) {
     return (
       <div className={styles.container}>
-        <div className={styles.container__leftSide} />
         <div className={styles.container__main}>
           <div className={styles.container__headerMain}>
-            <p className={styles.container__text}>Recent projects</p>
+            <p className={styles.container__text}>Projects</p>
           </div>
           <div className={styles.errorState}>
             <div className={styles.errorIcon}>⚠️</div>
@@ -69,10 +86,9 @@ export const MainPage = () => {
   if (projects.items.length === 0) {
     return (
       <div className={styles.container}>
-        <div className={styles.container__leftSide} />
         <div className={styles.container__main}>
           <div className={styles.container__headerMain}>
-            <p className={styles.container__text}>Recent projects</p>
+            <p className={styles.container__text}>Projects</p>
             <p className={styles.container__text} style={{ textDecoration: 'underline', marginTop: 2 }}>
               0
             </p>
@@ -89,18 +105,33 @@ export const MainPage = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.container__leftSide} />
       <div className={styles.container__main}>
         <div className={styles.container__headerMain}>
-          <p className={styles.container__text}>Recent projects</p>
+          <p className={styles.container__text}>Projects</p>
           <p className={styles.container__text} style={{ textDecoration: 'underline', marginTop: 2 }}>
             {projects.items.length}
           </p>
         </div>
         {projects.items.map((item, index) => (
-          <ProjectComponent onClick={() => handleClickProject(index)} name={item.name} key={item.id} />
+          <ProjectComponent
+            onClickUsers={() => handleClickParticipants(item.id)}
+            onClick={() => handleClickProject(index)}
+            name={item.name}
+            key={item.id}
+          />
         ))}
       </div>
+      {showParticipantsModal && (
+        <ParticipantsModal
+          onClosed={() => {
+            setShowParticipantsModal(false);
+            setParticipants([]);
+            setLoadingMembers(false);
+          }}
+          participants={participants}
+          loading={loadingMembers}
+        />
+      )}
     </div>
   );
 };

@@ -20,6 +20,27 @@
     color: black;
     font-weight: 600;
   }
+  &__mobileMenu {
+    display: none;
+    position: relative;
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+
+  &__desktopLogo {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__desktopNav {
+    @media (max-width: 768px) {
+      display: none !important;
+    }
+  }
+
   &__participantsScroll {
     margin-top: 10px;
     max-height: 100px;

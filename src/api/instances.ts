@@ -8,6 +8,7 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 const apiClient = axios.create({
   baseURL: 'https://diploma-thesis.onrender.com',
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 let store: any = null;
@@ -78,7 +79,7 @@ apiClient.interceptors.response.use(
         const resultAction = await store.dispatch(refreshAccessToken());
 
         if (refreshAccessToken.fulfilled.match(resultAction)) {
-          const newAccessToken = resultAction.payload.access;
+          const newAccessToken = resultAction.payload.access_token;
           processQueue(null, newAccessToken);
 
           if (originalRequest.headers) {
@@ -87,6 +88,7 @@ apiClient.interceptors.response.use(
 
           return apiClient(originalRequest);
         }
+
         processQueue(new Error('Token refresh failed'), null);
         store.dispatch(logout());
         return Promise.reject(error);

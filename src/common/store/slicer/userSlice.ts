@@ -3,7 +3,6 @@ import apiClient from 'src/api/instances';
 
 interface UserState {
   access: string | null;
-  refresh: string | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
@@ -11,7 +10,6 @@ interface UserState {
 
 const initialState: UserState = {
   access: localStorage.getItem('access') || null,
-  refresh: localStorage.getItem('refresh') || null,
   isAuthenticated: !!localStorage.getItem('access'),
   loading: false,
   error: null,
@@ -22,12 +20,11 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
       const response = await apiClient.post('/user/login', credentials);
-      const { access_token, refresh_token } = response.data;
 
+      const { access_token } = response.data;
       localStorage.setItem('access', access_token);
-      localStorage.setItem('refresh', refresh_token);
 
-      return { access_token, refresh_token };
+      return { access_token };
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Login failed');
     }
@@ -36,27 +33,25 @@ export const login = createAsyncThunk(
 
 export const refreshAccessToken = createAsyncThunk('user/refreshToken', async (_, thunkAPI) => {
   try {
-    const state = thunkAPI.getState() as any;
-    const refresh = state.user.refresh;
+    const response = await apiClient.post('/user/refresh-token', {});
 
-    if (!refresh) {
-      throw new Error('No refresh token available');
-    }
+    const { access_token } = response.data;
+    localStorage.setItem('access', access_token);
 
-    const response = await apiClient.post('/user/refresh-token', { refresh });
-
-    localStorage.setItem('access', response.data.access);
-
-    if (response.data.refresh) {
-      localStorage.setItem('refresh', response.data.refresh);
-    }
-
-    return response.data;
+    return { access_token };
   } catch (error: any) {
     localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
-
     return thunkAPI.rejectWithValue(error.response?.data?.message || 'Token refresh failed');
+  }
+});
+
+export const logout = createAsyncThunk('user/logout', async (_, thunkAPI) => {
+  try {
+    await apiClient.post('/user/logout', {});
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    localStorage.removeItem('access');
   }
 });
 
@@ -64,13 +59,10 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    logout(state) {
+    logoutLocal(state) {
       state.access = null;
-      state.refresh = null;
       state.isAuthenticated = false;
-
       localStorage.removeItem('access');
-      localStorage.removeItem('refresh');
     },
   },
   extraReducers: builder => {
@@ -79,36 +71,36 @@ export const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action: PayloadAction<{ access_token: string; refresh_token: string }>) => {
-        const { access_token, refresh_token } = action.payload;
+      .addCase(login.fulfilled, (state, action: PayloadAction<{ access_token: string }>) => {
         state.loading = false;
-        state.access = access_token;
-        state.refresh = refresh_token;
+        state.access = action.payload.access_token;
         state.isAuthenticated = true;
+        state.error = null;
       })
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
         state.isAuthenticated = false;
+        state.access = null;
       })
-      .addCase(refreshAccessToken.fulfilled, (state, action: PayloadAction<{ access: string; refresh?: string }>) => {
-        state.access = action.payload.access;
-
-        if (action.payload.refresh) {
-          state.refresh = action.payload.refresh;
-        }
+      .addCase(refreshAccessToken.fulfilled, (state, action: PayloadAction<{ access_token: string }>) => {
+        state.access = action.payload.access_token;
         state.isAuthenticated = true;
+        state.error = null;
       })
       .addCase(refreshAccessToken.rejected, (state, action: PayloadAction<any>) => {
         state.error = action.payload;
         state.isAuthenticated = false;
         state.access = null;
-        state.refresh = null;
         localStorage.removeItem('access');
-        localStorage.removeItem('refresh');
+      })
+      .addCase(logout.fulfilled, state => {
+        state.access = null;
+        state.isAuthenticated = false;
+        state.error = null;
       });
   },
 });
 
-export const { logout } = userSlice.actions;
+export const { logoutLocal } = userSlice.actions;
 export default userSlice.reducer;

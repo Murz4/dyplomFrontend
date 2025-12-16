@@ -70,7 +70,7 @@ const router = createBrowserRouter([
         element: <AuthPage mode='password-changed' />,
       },
       {
-        path: 'board',
+        path: 'calendar',
         element: (
           <ProtectedRoute>
             <CalendarPage />

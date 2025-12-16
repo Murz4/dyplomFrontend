@@ -6,6 +6,7 @@
   padding: 10px 16px 10px 29px;
   display: flex;
   justify-content: space-between;
+  gap: 20px;
   align-items: center;
 
   &__rightContent {
@@ -39,5 +40,10 @@
     font-size: 20px;
     font-weight: 800;
     color: #f9fff1;
+  }
+}
+@media (max-width: 450px) {
+  .container {
+    padding-left: 5px;
   }
 }

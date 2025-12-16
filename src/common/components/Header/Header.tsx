@@ -1,9 +1,12 @@
 import { HeaderButton } from '@modules/header/HeaderButton/HeaderButton';
 import dinosaurImage from '/dinosaurImage.svg';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Modal } from '@modules/main/Modal/Modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { RiMenu3Line } from 'react-icons/ri';
+import { MdSpaceDashboard, MdHome, MdSettings } from 'react-icons/md';
 
 import styles from './header.module.scss';
 import { StepItem } from '../StepItem/StepItem';
@@ -32,7 +35,10 @@ const step4ValidationSchema = Yup.object({
 });
 
 export const Header = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isClosed, setIsClosed] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [stepCount, setStepCount] = useState(1);
   const [formData, setFormData] = useState({
     projectName: '',
@@ -44,10 +50,13 @@ export const Header = () => {
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [participantEmail, setParticipantEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const totalSteps = 4;
-
   const dispatch = useAppDispatch();
+
+  const isOnMainPage = location.pathname === '/';
+  const isOnCalendar = location.pathname === '/calendar';
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -70,6 +79,22 @@ export const Header = () => {
       fetchCategories();
     }
   }, [isClosed]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const handleNext = (values: any) => {
     setFormData({ ...formData, ...values });
@@ -140,15 +165,155 @@ export const Header = () => {
     setEmailError('');
   };
 
+  const handleMenuItemClick = (path: string) => {
+    navigate(path);
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className={styles.container}>
-      <img src={dinosaurImage} alt='Dinosaur' />
-      <div className={styles.container__buttons}>
-        <div style={{ width: 70 }}>
-          <HeaderButton onClick={() => setIsClosed(false)}>Create</HeaderButton>
-        </div>
-        <div style={{ width: 70 }}>
-          <HeaderButton>Join</HeaderButton>
+      <img
+        src={dinosaurImage}
+        alt='Dinosaur'
+        style={{ cursor: 'pointer' }}
+        onClick={() => navigate('/')}
+        className={styles.container__desktopLogo}
+      />
+
+      <div className={styles.container__mobileMenu} ref={menuRef}>
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <RiMenu3Line size={28} color='#333' />
+        </button>
+
+        {isMenuOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              marginTop: '12px',
+              backgroundColor: '#EBF3FF',
+              borderRadius: '16px',
+              padding: '16px',
+              minWidth: '200px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              zIndex: 1000,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {!isOnCalendar && (
+                <div
+                  onClick={() => handleMenuItemClick('/calendar')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '10px 12px',
+                    cursor: 'pointer',
+                    borderRadius: '8px',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E8E8D0')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
+                  <MdSpaceDashboard size={24} color='#333' />
+                  <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>Calendar</span>
+                </div>
+              )}
+              {!isOnMainPage && (
+                <div
+                  onClick={() => handleMenuItemClick('/')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '10px 12px',
+                    cursor: 'pointer',
+                    borderRadius: '8px',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E8E8D0')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
+                  <MdHome size={24} color='#333' />
+                  <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>Home page</span>
+                </div>
+              )}
+              <div
+                onClick={() => handleMenuItemClick('/settings')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 12px',
+                  cursor: 'pointer',
+                  borderRadius: '8px',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E8E8D0')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+              >
+                <MdSettings size={24} color='#333' />
+                <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>Settings</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
+        <nav className={styles.container__desktopNav} style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+          {!isOnMainPage && (
+            <span
+              onClick={() => navigate('/')}
+              style={{
+                fontSize: 16,
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                color: '#333',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#5B6B9E')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#333')}
+            >
+              Home
+            </span>
+          )}
+          {!isOnCalendar && (
+            <span
+              onClick={() => navigate('/calendar')}
+              style={{
+                fontSize: 16,
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                color: '#333',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#5B6B9E')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#333')}
+            >
+              Calendar
+            </span>
+          )}
+        </nav>
+        <div className={styles.container__buttons}>
+          <div style={{ width: 70, height: 30 }}>
+            <HeaderButton onClick={() => setIsClosed(false)}>Create</HeaderButton>
+          </div>
+          <div style={{ width: 70, height: 30 }}>
+            <HeaderButton>Join</HeaderButton>
+          </div>
         </div>
       </div>
 

@@ -43,12 +43,12 @@ const taskValidationSchema = Yup.object({
 
 export const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 640);
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 850);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
+      setIsMobile(window.innerWidth < 850);
     };
 
     window.addEventListener('resize', handleResize);

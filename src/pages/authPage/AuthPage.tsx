@@ -129,7 +129,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
 
     const validateResetToken = async () => {
       try {
-        const response = await apiClient.get('/user/validate-reset-token', {
+        const response = await apiClient.get('/user/reset_password', {
           params: { token },
         });
 
@@ -237,18 +237,17 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
     { setSubmitting }: FormikHelpers<NewPasswordFormValues>
   ) => {
     try {
-      setSuccessMessage('');
+      setSuccessMessage('Password has been changed');
       setErrorMessage('');
 
       const response = await apiClient.post('/user/reset-password', {
-        token: token,
         password: values.password,
       });
 
       console.log('Password reset response:', response.data);
 
       if (response.data) {
-        navigate('/password-changed');
+        navigate('/login');
       }
     } catch (error: any) {
       setErrorMessage(error?.message || 'An error occurred while resetting password');

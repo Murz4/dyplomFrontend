@@ -2,8 +2,8 @@
   width: 100%;
   height: calc(100vh - 80px);
   background-color: #ffb600;
-  overflow: auto;
   position: relative;
+  overflow: auto;
   background-image: url('/public/artBoardMain.png');
   background-size: cover;
   background-repeat: no-repeat;
@@ -12,6 +12,7 @@
   justify-content: center;
   gap: 51px;
   padding: 84px 15px 15px 15px;
+  scrollbar-color: rgba(255, 140, 0, 1) rgba(0, 0, 0, 0.3);
 
   &__leftSide {
     height: 229px;
@@ -43,6 +44,13 @@
   &__text {
     font-size: 20px;
     font-weight: bold;
+  }
+  @media (max-width: 1070px) {
+    .container {
+      &__leftSide {
+        display: none;
+      }
+    }
   }
 }
 
