@@ -244,8 +244,8 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       setErrorMessage('');
 
       const response = await apiClient.post('/user/reset-password', {
-        password: values.password,
         token: token,
+        password: values.password,
       });
 
       console.log('Password reset response:', response.data);
