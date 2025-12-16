@@ -522,7 +522,11 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                         />
-                        {successMessage && <div className={styles.container__successMessage}>{successMessage}</div>}
+                        {successMessage && (
+                          <div style={{ marginTop: 10 }} className={styles.container__successMessage}>
+                            {successMessage}
+                          </div>
+                        )}
                         {errors.confirmPassword && touched.confirmPassword && (
                           <p className={styles.container__errorText}>{errors.confirmPassword}</p>
                         )}
