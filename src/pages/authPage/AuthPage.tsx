@@ -255,6 +255,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       setTimeout(() => setErrorMessage(''), 5000);
     } finally {
       setSubmitting(false);
+      console.log(values.password);
     }
   };
 
@@ -486,7 +487,14 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                       <p className={styles.container__verifyTitle}>Create a New Password</p>
                     </div>
                     <div
-                      style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 20,
+                        paddingTop: 20,
+                      }}
                     >
                       <div style={{ width: '100%' }}>
                         <CustomInput
