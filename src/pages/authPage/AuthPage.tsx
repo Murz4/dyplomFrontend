@@ -248,8 +248,8 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       });
 
       console.log('Password reset response:', response.data);
-      setSuccessMessage('Password has been changed');
       if (response.data) {
+        setSuccessMessage('Password has been changed');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
