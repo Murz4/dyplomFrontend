@@ -6,7 +6,7 @@ import { CustomInput } from '@common/components/CustomInput/CustomInput';
 import { ArchivedProjectItem } from '@modules/settings/ArchivedProjectItem';
 import { useAppDispatch, useAppSelector } from '@common/store/hooks';
 import { getProjects } from '@common/store/slicer/getProjectsSlice';
-import styles from './SettingsPage.module.scss';
+import styles from './settingsPage.module.scss';
 import { patchArchive } from 'src/api/patchArchive';
 
 const changeNameSchema = Yup.object({
