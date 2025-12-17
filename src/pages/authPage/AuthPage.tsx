@@ -423,7 +423,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                 link to proceed.
               </p>
             </div>
-            <img style={{ marginRight: 10 }} src='/verifyImage.svg' />
+            <img style={{ marginRight: 10 }} src='/verifyImage.svg' alt='verify image' />
           </div>
         </div>
       ) : formState === 'change-password' ? (
@@ -612,7 +612,7 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
                   <p className={styles.container__verifyTitle}>Email Verified ✅</p>
                   <p className={styles.container__verifyText}>Your email address has been successfully verified.</p>
                 </div>
-                <img src='/verifySuccessImage.svg' />
+                <img src='/verifySuccessImage.svg' alt='verify success image' />
                 <HeaderButton
                   onClick={() => navigate('/login', { replace: true })}
                   style={{

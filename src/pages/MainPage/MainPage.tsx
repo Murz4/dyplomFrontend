@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from '@common/store/hooks';
 import { getProjects } from '@common/store/slicer/getProjectsSlice';
 import { ParticipantsModal } from '@modules/main/ProjectModal/ParticipantsModal';
 import { getProjectMembers } from 'src/api/getProjectMembers';
+import { ProjectSettings } from '@modules/main/ProjectSettings/ProjectSettings';
+import { setProject } from '@common/store/slicer/projectDataSlice';
 
 export const MainPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -13,6 +15,8 @@ export const MainPage = () => {
   const projects = useAppSelector(state => state.projects);
   const dispatch = useAppDispatch();
   const [participants, setParticipants] = useState([]);
+  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
+  const filteredProjectsArray = projects.items.filter(item => item.is_archived === false);
 
   useLayoutEffect(() => {
     const fetchProjects = async () => {
@@ -26,7 +30,7 @@ export const MainPage = () => {
     };
 
     fetchProjects();
-  }, [projects.items.length]);
+  }, [filteredProjectsArray.length]);
 
   const handleClickProject = (index: number) => {
     console.log(index);
@@ -45,6 +49,11 @@ export const MainPage = () => {
     } finally {
       setLoadingMembers(false);
     }
+  };
+  const handleClickSettings = async (index: number, name: string) => {
+    await dispatch(setProject({ id: index, name: name }));
+
+    setShowSettingsModal(true);
   };
 
   if (projects.loading) {
@@ -83,7 +92,7 @@ export const MainPage = () => {
     );
   }
 
-  if (projects.items.length === 0) {
+  if (filteredProjectsArray.length === 0) {
     return (
       <div className={styles.container}>
         <div className={styles.container__main}>
@@ -109,13 +118,15 @@ export const MainPage = () => {
         <div className={styles.container__headerMain}>
           <p className={styles.container__text}>Projects</p>
           <p className={styles.container__text} style={{ textDecoration: 'underline', marginTop: 2 }}>
-            {projects.items.length}
+            {filteredProjectsArray.length}
           </p>
         </div>
-        {projects.items.map((item, index) => (
+        {filteredProjectsArray.map((item, index) => (
           <ProjectComponent
             onClickUsers={() => handleClickParticipants(item.id)}
             onClick={() => handleClickProject(index)}
+            creatorName={item.creator.full_name}
+            onClickSettings={() => handleClickSettings(item.id, item.name)}
             name={item.name}
             key={item.id}
           />
@@ -132,6 +143,7 @@ export const MainPage = () => {
           loading={loadingMembers}
         />
       )}
+      {showSettingsModal && <ProjectSettings onClosed={() => setShowSettingsModal(false)} />}
     </div>
   );
 };

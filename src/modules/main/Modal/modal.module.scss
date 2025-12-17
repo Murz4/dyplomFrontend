@@ -23,5 +23,8 @@
     padding-right: 15px;
     top: 0;
     left: 0;
+    @media (max-width: 768px) {
+      height: calc(100vh + 15px);
+    }
   }
 }

@@ -3,10 +3,12 @@ import userReducer from './slicer/userSlice';
 import registerReducer from './slicer/registrationSlice';
 import forgotPasswordReducer from './slicer/forgotPasswordSlice';
 import getProjectsReducer from './slicer/getProjectsSlice';
+import projectDataReducer from './slicer/projectDataSlice';
 
 const rootReducer = combineReducers({
   user: userReducer,
   register: registerReducer,
+  projectData: projectDataReducer,
   forgotPassword: forgotPasswordReducer,
   projects: getProjectsReducer,
 });

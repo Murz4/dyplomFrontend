@@ -18,8 +18,8 @@
 
   &__rightContentTop {
     display: flex;
-    align-items: center;
-    gap: 43px;
+    justify-content: flex-end;
+    gap: 20px;
   }
 
   &__button {

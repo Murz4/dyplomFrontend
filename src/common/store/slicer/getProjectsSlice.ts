@@ -4,6 +4,12 @@ import apiClient from 'src/api/instances';
 type IItems = {
   id: number;
   name: string;
+  is_archived: boolean;
+  creator: {
+    id: number;
+    full_name: string;
+    email: string;
+  };
 };
 
 interface IInitialStateProps {
@@ -31,10 +37,14 @@ const initialState: IInitialStateProps = {
   error: null,
 };
 
-export const getProjectsSlice = createSlice({
+const getProjectsSlice = createSlice({
   name: 'projects',
   initialState,
-  reducers: {},
+  reducers: {
+    removeProject: (state, action) => {
+      state.items = state.items.filter(p => p.id !== action.payload);
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(getProjects.pending, state => {
@@ -51,5 +61,5 @@ export const getProjectsSlice = createSlice({
       });
   },
 });
-
+export const { removeProject } = getProjectsSlice.actions;
 export default getProjectsSlice.reducer;

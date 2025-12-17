@@ -1,10 +1,10 @@
 import { HeaderButton } from '@modules/header/HeaderButton/HeaderButton';
 import dinosaurImage from '/dinosaurImage.svg';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Modal } from '@modules/main/Modal/Modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, data } from 'react-router-dom';
 import { RiMenu3Line } from 'react-icons/ri';
 import { MdSpaceDashboard, MdHome, MdSettings } from 'react-icons/md';
 
@@ -17,6 +17,7 @@ import { IoAddOutline } from 'react-icons/io5';
 import { postProject, ProjectPayload } from 'src/api/postProject';
 import { useAppDispatch } from '@common/store/hooks';
 import { getProjects } from '@common/store/slicer/getProjectsSlice';
+import { getUserName } from 'src/api/getUserName';
 
 const step1ValidationSchema = Yup.object({
   projectName: Yup.string().min(3, 'Min 3 symbols').max(50, 'Max 50 symbols').required('Project name is required'),
@@ -39,6 +40,7 @@ export const Header = () => {
   const location = useLocation();
   const [isClosed, setIsClosed] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [modalJoin, setModalJoin] = useState(false);
   const [stepCount, setStepCount] = useState(1);
   const [formData, setFormData] = useState({
     projectName: '',
@@ -50,6 +52,7 @@ export const Header = () => {
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [participantEmail, setParticipantEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [serverError, setServerError] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
 
   const totalSteps = 4;
@@ -57,6 +60,7 @@ export const Header = () => {
 
   const isOnMainPage = location.pathname === '/';
   const isOnCalendar = location.pathname === '/calendar';
+  const isOnSettings = location.pathname === '/settings';
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -96,20 +100,34 @@ export const Header = () => {
     };
   }, [isMenuOpen]);
 
+  const [userName, setUserName] = useState<any>(null);
+
+  useLayoutEffect(() => {
+    const loadUserName = async () => {
+      const data = await getUserName();
+      setUserName(data.full_name);
+    };
+
+    loadUserName();
+  }, []);
+
   const handleNext = (values: any) => {
     setFormData({ ...formData, ...values });
+    setServerError('');
     if (stepCount < totalSteps) {
       setStepCount(prev => prev + 1);
     }
   };
 
   const handleBack = () => {
+    setServerError('');
     if (stepCount > 1) {
       setStepCount(prev => prev - 1);
     }
   };
 
   const handleSubmit = async (values: any) => {
+    setServerError('');
     const finalData = { ...formData, ...values };
     const payload: ProjectPayload = {
       name: finalData.projectName,
@@ -122,12 +140,15 @@ export const Header = () => {
     try {
       const createdProject = await postProject(payload);
       console.log('add project:', createdProject);
-      await dispatch(getProjects({ cursor: 0, limit: 10 }));
+      await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
       setIsClosed(true);
       setStepCount(1);
       setFormData({ projectName: '', category: null, participants: [], details: '' });
-    } catch (error) {
-      console.error('error:', error.message);
+      setServerError('');
+    } catch (error: any) {
+      console.error('errorrrr:', error.message);
+      const errorMessage = error.message || 'An error occurred while creating the project';
+      setServerError(errorMessage);
     }
   };
 
@@ -135,6 +156,7 @@ export const Header = () => {
     setIsClosed(true);
     setStepCount(1);
     setFormData({ projectName: '', category: null, participants: [], details: '' });
+    setServerError('');
   };
 
   const validateEmail = (email: string) => {
@@ -250,71 +272,108 @@ export const Header = () => {
                   <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>Home page</span>
                 </div>
               )}
-              <div
-                onClick={() => handleMenuItemClick('/settings')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '10px 12px',
-                  cursor: 'pointer',
-                  borderRadius: '8px',
-                  transition: 'background-color 0.2s',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E8E8D0')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <MdSettings size={24} color='#333' />
-                <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>Settings</span>
-              </div>
+              {!isOnSettings && (
+                <div
+                  onClick={() => handleMenuItemClick('/settings')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '10px 12px',
+                    cursor: 'pointer',
+                    borderRadius: '8px',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E8E8D0')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
+                  <MdSettings size={24} color='#333' />
+                  <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>Settings</span>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
-        <nav className={styles.container__desktopNav} style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-          {!isOnMainPage && (
-            <span
-              onClick={() => navigate('/')}
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                color: '#333',
-                transition: 'color 0.2s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#5B6B9E')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#333')}
-            >
-              Home
-            </span>
-          )}
-          {!isOnCalendar && (
-            <span
-              onClick={() => navigate('/calendar')}
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                color: '#333',
-                transition: 'color 0.2s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#5B6B9E')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#333')}
-            >
-              Calendar
-            </span>
-          )}
-        </nav>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div className={styles.container__buttons}>
           <div style={{ width: 70, height: 30 }}>
             <HeaderButton onClick={() => setIsClosed(false)}>Create</HeaderButton>
           </div>
           <div style={{ width: 70, height: 30 }}>
-            <HeaderButton>Join</HeaderButton>
+            <HeaderButton onClick={() => setModalJoin(true)}>Join</HeaderButton>
           </div>
         </div>
+        <nav className={styles.container__desktopNav} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {!isOnMainPage && (
+            <div
+              style={{
+                height: 30,
+                width: 45,
+                display: 'flex',
+                alignItems: 'center',
+                cursor: 'pointer',
+                justifyContent: 'center',
+                backgroundColor: '#C5DCFF',
+                borderRadius: 5,
+              }}
+              onClick={() => navigate('/')}
+            >
+              <MdHome size={25} />
+            </div>
+          )}
+          {!isOnCalendar && (
+            <div
+              onClick={() => navigate('/calendar')}
+              style={{
+                height: 30,
+                width: 45,
+                backgroundColor: '#C5DCFF',
+                paddingTop: 3,
+                paddingBottom: 3,
+                paddingLeft: 10,
+                paddingRight: 9,
+                borderRadius: 5,
+                cursor: 'pointer',
+              }}
+            >
+              <img width={'100%'} height={'100%'} src='/calendarImage.svg' alt='calendar icon' />
+            </div>
+          )}
+        </nav>
+        <div
+          style={{
+            backgroundColor: '#C5DCFF',
+            height: 30,
+            borderRadius: 5,
+            display: 'flex',
+            alignItems: 'center',
+            paddingLeft: 7,
+            paddingRight: 7,
+          }}
+        >
+          <p style={{ fontSize: 16, fontWeight: 600, color: '#000000' }}>{userName}</p>
+        </div>
+        {!isOnSettings && (
+          <div
+            style={{
+              height: 30,
+              width: 45,
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              paddingTop: 5,
+              paddingBottom: 5,
+              justifyContent: 'center',
+              backgroundColor: '#C5DCFF',
+              borderRadius: 5,
+            }}
+            onClick={() => navigate('/settings')}
+          >
+            <img width={23} height={23} style={{ cursor: 'pointer' }} src='/settingIcon.svg' alt='settings icon' />
+          </div>
+        )}
       </div>
 
       {!isClosed && (
@@ -624,6 +683,7 @@ export const Header = () => {
                         <ErrorMessage name='details'>
                           {msg => <div style={{ color: 'red', fontSize: 14 }}>{msg}</div>}
                         </ErrorMessage>
+                        {serverError && <p style={{ color: 'red', fontSize: 14, marginTop: 10 }}>{serverError}</p>}
                       </div>
                     </div>
 
@@ -646,6 +706,25 @@ export const Header = () => {
                 )}
               </Formik>
             )}
+          </div>
+        </Modal>
+      )}
+      {modalJoin && (
+        <Modal onClosed={() => setModalJoin(false)}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+              alignItems: 'center',
+              marginTop: 20,
+            }}
+          >
+            <CustomInput style={{ height: 56 }} />
+            <p style={{ fontSize: 20, textDecoration: 'underline', color: 'black' }}>Enter the project code</p>
+            <HeaderButton style={{ height: 70, maxWidth: 262, borderRadius: 25, marginTop: 20, fontSize: 30 }}>
+              Join the project
+            </HeaderButton>
           </div>
         </Modal>
       )}

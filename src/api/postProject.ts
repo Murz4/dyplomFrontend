@@ -22,7 +22,16 @@ export const postProject = async (payload: ProjectPayload): Promise<ProjectRespo
     const response = await apiClient.post<ProjectResponse>('/projects', payload);
     return response.data;
   } catch (error: any) {
-    console.error('error:', error?.response?.data || error.message);
-    throw new Error('try again');
+    console.error('error:', error);
+
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
+    }
+
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+
+    throw new Error(error.message || 'An error occurred while creating the project');
   }
 };

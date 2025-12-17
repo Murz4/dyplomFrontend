@@ -9,6 +9,7 @@ import { CalendarPage } from '@pages/CalendarPage/CalendarPage';
 import { TasksPage } from '@pages/TasksPage/TasksPage';
 import { ProtectedRoute } from '@pages/Layout/ProtectedRoute';
 import { PublicRoute } from '@pages/Layout/PublicRoute';
+import { SettingsPage } from '@pages/SettingsPage/SettingsPage';
 
 setupInterceptors(store);
 
@@ -82,6 +83,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <TasksPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings',
+        element: (
+          <ProtectedRoute>
+            <SettingsPage />
           </ProtectedRoute>
         ),
       },

@@ -29,7 +29,7 @@ export const forgotPassword = createAsyncThunk(
   }
 );
 
-export const forgotPasswordSlice = createSlice({
+const forgotPasswordSlice = createSlice({
   name: 'forgotPassword',
   initialState,
   reducers: {},
