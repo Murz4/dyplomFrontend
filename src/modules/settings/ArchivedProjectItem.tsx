@@ -1,6 +1,6 @@
 import React from 'react';
 import { HeaderButton } from '@modules/header/HeaderButton/HeaderButton';
-import styles from './ArchivedProjectItem.module.scss';
+import styles from './archivedProjectItem.module.scss';
 
 interface ArchivedProjectItemProps {
   projectName: string;
