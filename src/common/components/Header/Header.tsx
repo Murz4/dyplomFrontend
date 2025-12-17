@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Modal } from '@modules/main/Modal/Modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate, useLocation, data } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { RiMenu3Line } from 'react-icons/ri';
 import { MdSpaceDashboard, MdHome, MdSettings } from 'react-icons/md';
 
