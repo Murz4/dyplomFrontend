@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import styles from './mainPage.module.scss';
 import { ProjectComponent } from '@modules/main/ProjectComponent/ProjectComponent';
 import { useAppDispatch, useAppSelector } from '@common/store/hooks';
@@ -7,6 +7,8 @@ import { ParticipantsModal } from '@modules/main/ProjectModal/ParticipantsModal'
 import { getProjectMembers } from 'src/api/getProjectMembers';
 import { ProjectSettings } from '@modules/main/ProjectSettings/ProjectSettings';
 import { setProject } from '@common/store/slicer/projectDataSlice';
+import toast from 'react-hot-toast';
+import { getJoinLink } from 'src/api/getJoinLink';
 
 export const MainPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +19,78 @@ export const MainPage = () => {
   const [participants, setParticipants] = useState([]);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const filteredProjectsArray = projects.items.filter(item => item.is_archived === false);
+
+  useEffect(() => {
+    const pendingToken = localStorage.getItem('pendingInviteToken');
+
+    if (!pendingToken) {
+      return;
+    }
+
+    getJoinLink(pendingToken)
+      .then(response => {
+        const successMessage =
+          typeof response.data === 'string' ? response.data : 'You have successfully joined the project!';
+
+        toast.success(successMessage, {
+          duration: 3000,
+          style: {
+            fontSize: '18px',
+            padding: '16px',
+          },
+          icon: '✅',
+        });
+
+        dispatch(getProjects({ cursor: 0, limit: 10 }));
+      })
+      .catch((error: any) => {
+        console.error('[MainPage] Ошибка присоединения:', error.response?.data || error);
+
+        let errorMsg = 'Failed to join the project';
+
+        if (error.response?.data?.detail) {
+          const detail = error.response.data.detail;
+
+          if (Array.isArray(detail)) {
+            errorMsg = detail
+              .map((d: any) => d.msg || '')
+              .filter(Boolean)
+              .join('. ');
+          } else if (typeof detail === 'string') {
+            errorMsg = detail;
+          }
+        } else if (error.response?.data?.message) {
+          errorMsg = error.response.data.message;
+        }
+
+        if (
+          errorMsg.toLowerCase().includes('already') ||
+          errorMsg.toLowerCase().includes('member') ||
+          error.response?.status === 400 ||
+          error.response?.status === 422
+        ) {
+          toast(errorMsg, {
+            icon: 'ℹ️',
+            duration: 6000,
+            style: {
+              fontSize: '18px',
+              padding: '16px',
+            },
+          });
+        } else {
+          toast.error(errorMsg, {
+            duration: 6000,
+            style: {
+              fontSize: '18px',
+              padding: '16px',
+            },
+          });
+        }
+      })
+      .finally(() => {
+        localStorage.removeItem('pendingInviteToken');
+      });
+  }, [dispatch]);
 
   useLayoutEffect(() => {
     const fetchProjects = async () => {

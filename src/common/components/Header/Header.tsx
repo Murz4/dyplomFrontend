@@ -7,7 +7,6 @@ import * as Yup from 'yup';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RiMenu3Line } from 'react-icons/ri';
 import { MdSpaceDashboard, MdHome, MdSettings } from 'react-icons/md';
-
 import styles from './header.module.scss';
 import { StepItem } from '../StepItem/StepItem';
 import { DropDown } from '../DropDown/DropDown';
@@ -18,6 +17,7 @@ import { postProject, ProjectPayload } from 'src/api/postProject';
 import { useAppDispatch } from '@common/store/hooks';
 import { getProjects } from '@common/store/slicer/getProjectsSlice';
 import { getUserName } from 'src/api/getUserName';
+import { postJoinByCode } from 'src/api/postJoinByCode';
 
 const step1ValidationSchema = Yup.object({
   projectName: Yup.string().min(3, 'Min 3 symbols').max(50, 'Max 50 symbols').required('Project name is required'),
@@ -33,6 +33,10 @@ const step3ValidationSchema = Yup.object({
 
 const step4ValidationSchema = Yup.object({
   details: Yup.string().max(500, 'Max 500 symbols'),
+});
+
+const joinValidationSchema = Yup.object({
+  code: Yup.string().trim().required('Enter the project code'),
 });
 
 export const Header = () => {
@@ -53,8 +57,8 @@ export const Header = () => {
   const [participantEmail, setParticipantEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [serverError, setServerError] = useState('');
+  const [joinError, setJoinError] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
-
   const totalSteps = 4;
   const dispatch = useAppDispatch();
 
@@ -78,7 +82,6 @@ export const Header = () => {
         setIsLoadingCategories(false);
       }
     };
-
     if (!isClosed) {
       fetchCategories();
     }
@@ -90,24 +93,20 @@ export const Header = () => {
         setIsMenuOpen(false);
       }
     };
-
     if (isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMenuOpen]);
 
   const [userName, setUserName] = useState<any>(null);
-
   useLayoutEffect(() => {
     const loadUserName = async () => {
       const data = await getUserName();
       setUserName(data.full_name);
     };
-
     loadUserName();
   }, []);
 
@@ -131,23 +130,20 @@ export const Header = () => {
     const finalData = { ...formData, ...values };
     const payload: ProjectPayload = {
       name: finalData.projectName,
-      purpose_id: finalData.category,
+      purpose_id: finalData.category!,
       description: finalData.details,
       users: finalData.participants,
     };
-    console.log('Payload for API:', payload);
 
     try {
-      const createdProject = await postProject(payload);
-      console.log('add project:', createdProject);
+      await postProject(payload);
       await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
       setIsClosed(true);
       setStepCount(1);
       setFormData({ projectName: '', category: null, participants: [], details: '' });
-      setServerError('');
     } catch (error: any) {
-      console.error('errorrrr:', error.message);
-      const errorMessage = error.message || 'An error occurred while creating the project';
+      const errorMessage =
+        error.response?.data?.message || error.message || 'An error occurred while creating the project';
       setServerError(errorMessage);
     }
   };
@@ -155,6 +151,8 @@ export const Header = () => {
   const handleClose = () => {
     setIsClosed(true);
     setStepCount(1);
+    setParticipantEmail('');
+    setEmailError('');
     setFormData({ projectName: '', category: null, participants: [], details: '' });
     setServerError('');
   };
@@ -169,17 +167,14 @@ export const Header = () => {
       setEmailError('Please enter an email');
       return;
     }
-
     if (!validateEmail(participantEmail)) {
       setEmailError('Please enter a valid email');
       return;
     }
-
     if (participants.includes(participantEmail)) {
       setEmailError('This email is already added');
       return;
     }
-
     const updatedParticipants = [...participants, participantEmail];
     setFieldValue('participants', updatedParticipants);
     setFormData({ ...formData, participants: updatedParticipants });
@@ -305,6 +300,7 @@ export const Header = () => {
             <HeaderButton onClick={() => setModalJoin(true)}>Join</HeaderButton>
           </div>
         </div>
+
         <nav className={styles.container__desktopNav} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           {!isOnMainPage && (
             <div
@@ -330,18 +326,16 @@ export const Header = () => {
                 height: 30,
                 width: 45,
                 backgroundColor: '#C5DCFF',
-                paddingTop: 3,
-                paddingBottom: 3,
-                paddingLeft: 10,
-                paddingRight: 9,
+                padding: '3px 10px',
                 borderRadius: 5,
                 cursor: 'pointer',
               }}
             >
-              <img width={'100%'} height={'100%'} src='/calendarImage.svg' alt='calendar icon' />
+              <img width='100%' height='100%' src='/calendarImage.svg' alt='calendar icon' />
             </div>
           )}
         </nav>
+
         <div
           style={{
             backgroundColor: '#C5DCFF',
@@ -349,12 +343,12 @@ export const Header = () => {
             borderRadius: 5,
             display: 'flex',
             alignItems: 'center',
-            paddingLeft: 7,
-            paddingRight: 7,
+            padding: '0 7px',
           }}
         >
           <p style={{ fontSize: 16, fontWeight: 600, color: '#000000' }}>{userName}</p>
         </div>
+
         {!isOnSettings && (
           <div
             style={{
@@ -363,15 +357,13 @@ export const Header = () => {
               display: 'flex',
               alignItems: 'center',
               cursor: 'pointer',
-              paddingTop: 5,
-              paddingBottom: 5,
               justifyContent: 'center',
               backgroundColor: '#C5DCFF',
               borderRadius: 5,
             }}
             onClick={() => navigate('/settings')}
           >
-            <img width={23} height={23} style={{ cursor: 'pointer' }} src='/settingIcon.svg' alt='settings icon' />
+            <img width={23} height={23} src='/settingIcon.svg' alt='settings icon' />
           </div>
         )}
       </div>
@@ -416,7 +408,6 @@ export const Header = () => {
                         </ErrorMessage>
                       </div>
                     </div>
-
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 37 }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                         <HeaderButton type='submit' style={{ borderRadius: 15, width: 88, height: 35 }}>
@@ -492,7 +483,6 @@ export const Header = () => {
                         </ErrorMessage>
                       </div>
                     </div>
-
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 37 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
                         <HeaderButton
@@ -537,8 +527,7 @@ export const Header = () => {
                           <div
                             style={{
                               height: 52,
-                              paddingRight: 1,
-                              paddingLeft: 5,
+                              padding: '0 5px',
                               display: 'flex',
                               alignItems: 'center',
                               backgroundColor: '#C7CFE6',
@@ -584,8 +573,6 @@ export const Header = () => {
                               gap: 12,
                               alignItems: 'center',
                               justifyContent: 'center',
-                              paddingRight: 17,
-                              paddingLeft: 17,
                               backgroundColor: '#C7CFE6',
                             }}
                           >
@@ -614,9 +601,9 @@ export const Header = () => {
                                   <button
                                     type='button'
                                     onClick={() => {
-                                      const updatedParticipants = values.participants.filter((_, i) => i !== index);
-                                      setFieldValue('participants', updatedParticipants);
-                                      setFormData({ ...formData, participants: updatedParticipants });
+                                      const updated = values.participants.filter((_, i) => i !== index);
+                                      setFieldValue('participants', updated);
+                                      setFormData({ ...formData, participants: updated });
                                     }}
                                     style={{
                                       background: 'none',
@@ -636,7 +623,6 @@ export const Header = () => {
                         )}
                       </div>
                     </div>
-
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 37 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
                         <HeaderButton
@@ -686,7 +672,6 @@ export const Header = () => {
                         {serverError && <p style={{ color: 'red', fontSize: 14, marginTop: 10 }}>{serverError}</p>}
                       </div>
                     </div>
-
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 37 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
                         <HeaderButton
@@ -709,23 +694,96 @@ export const Header = () => {
           </div>
         </Modal>
       )}
+
       {modalJoin && (
-        <Modal onClosed={() => setModalJoin(false)}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 14,
-              alignItems: 'center',
-              marginTop: 20,
+        <Modal
+          onClosed={() => {
+            setModalJoin(false);
+            setJoinError('');
+          }}
+        >
+          <Formik
+            initialValues={{ code: '' }}
+            validationSchema={joinValidationSchema}
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
+              setJoinError('');
+              setSubmitting(true);
+
+              try {
+                console.log('code', values.code);
+                await postJoinByCode(values.code.trim());
+
+                setModalJoin(false);
+                resetForm();
+                await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
+              } catch (error: any) {
+                const errorMessage =
+                  error.response?.data?.message || error.message || 'An error occurred while creating the project';
+                setJoinError(errorMessage);
+              } finally {
+                setSubmitting(false);
+              }
             }}
           >
-            <CustomInput style={{ height: 56 }} />
-            <p style={{ fontSize: 20, textDecoration: 'underline', color: 'black' }}>Enter the project code</p>
-            <HeaderButton style={{ height: 70, maxWidth: 262, borderRadius: 25, marginTop: 20, fontSize: 30 }}>
-              Join the project
-            </HeaderButton>
-          </div>
+            {({ isSubmitting }) => (
+              <Form
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 30,
+                  marginTop: 40,
+                  width: '100%',
+                  padding: '0 20px',
+                }}
+              >
+                <p style={{ fontSize: 28, fontWeight: 600, textAlign: 'center' }}>Join the project</p>
+
+                <div
+                  style={{
+                    width: '100%',
+                    maxWidth: 400,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 20,
+                  }}
+                >
+                  <Field name='code'>
+                    {({ field }: any) => (
+                      <CustomInput
+                        {...field}
+                        placeholder='Enter the project code'
+                        style={{ height: 56, fontSize: 20, borderRadius: 15 }}
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name='code'>
+                    {msg => <div style={{ color: 'red', fontSize: 14, marginTop: 8, textAlign: 'left' }}>{msg}</div>}
+                  </ErrorMessage>
+                  <p style={{ fontSize: 20, textDecoration: 'underline', color: 'black' }}>Enter the project code</p>
+                </div>
+
+                {joinError && (
+                  <p style={{ color: 'red', fontSize: 16, textAlign: 'center', maxWidth: 400 }}>{joinError}</p>
+                )}
+
+                <HeaderButton
+                  type='submit'
+                  disabled={isSubmitting}
+                  style={{
+                    height: 70,
+                    maxWidth: 300,
+                    borderRadius: 25,
+                    fontSize: 28,
+                    opacity: isSubmitting ? 0.7 : 1,
+                  }}
+                >
+                  {isSubmitting ? 'Joining...' : 'Join the project'}
+                </HeaderButton>
+              </Form>
+            )}
+          </Formik>
         </Modal>
       )}
     </div>

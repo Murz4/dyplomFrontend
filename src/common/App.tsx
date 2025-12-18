@@ -10,10 +10,16 @@ import { TasksPage } from '@pages/TasksPage/TasksPage';
 import { ProtectedRoute } from '@pages/Layout/ProtectedRoute';
 import { PublicRoute } from '@pages/Layout/PublicRoute';
 import { SettingsPage } from '@pages/SettingsPage/SettingsPage';
+import { InviteHandlerPage } from '@pages/InviteHandlerPage/InviteHandlerPage';
+import { Toaster } from 'react-hot-toast';
 
 setupInterceptors(store);
 
 const router = createBrowserRouter([
+  {
+    path: '/projects/join/:token',
+    element: <InviteHandlerPage />,
+  },
   {
     path: '/',
     element: <Layout />,
@@ -101,6 +107,22 @@ const router = createBrowserRouter([
 const App = () => (
   <Provider store={store}>
     <RouterProvider router={router} />
+    <Toaster
+      position='top-right'
+      containerStyle={{
+        top: 20,
+        right: 20,
+      }}
+      toastOptions={{
+        duration: 3000,
+        style: {
+          background: '#333',
+          color: '#fff',
+          borderRadius: '8px',
+          fontSize: '16px',
+        },
+      }}
+    />
   </Provider>
 );
 

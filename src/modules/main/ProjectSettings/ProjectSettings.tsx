@@ -16,6 +16,7 @@ type PageType =
   | 'rename'
   | 'archive-confirm'
   | 'archive-success'
+  | 'archive-error'
   | 'delete-confirm-1'
   | 'delete-confirm-2'
   | 'delete-success'
@@ -34,20 +35,41 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
 
   const handleArchive = async () => {
-    console.log('currentPROJECTID', currentProjectId);
+    if (!currentProjectId) {
+      return;
+    }
+
+    setIsArchiving(true);
+    setArchiveError(null);
+
     try {
       await patchArchive({ project_id: currentProjectId, is_archived: true });
       setCurrentPage('archive-success');
+      console.log(23233232);
       setTimeout(() => {
         dispatch(removeProject(currentProjectId));
         onClosed();
         dispatch(clearProject());
       }, 500);
-      setTimeout(() => setCurrentPage('main'), 500);
-    } catch (error) {
-      console.error('Error archiving project:', error.message);
+    } catch (error: any) {
+      let errorMessage = 'Failed to archive project. Please try again.';
+
+      if (error?.response?.status === 403) {
+        errorMessage = 'You do not have permission to archive this project.';
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      setArchiveError(errorMessage);
+      setCurrentPage('archive-error');
+    } finally {
+      setIsArchiving(false);
     }
   };
 
@@ -63,8 +85,6 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
     setIsDeleting(true);
     setDeleteError(null);
 
-    console.log('Отправка запроса на удаление проекта:', { projectId: currentProjectId });
-
     try {
       await deleteProject(currentProjectId);
       setCurrentPage('delete-success');
@@ -74,8 +94,6 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
         dispatch(clearProject());
       }, 500);
     } catch (error: any) {
-      console.error('error:', error.message);
-
       let errorMessage = 'Failed to delete project. Please try again.';
 
       if (error?.response?.status === 403) {
@@ -157,25 +175,13 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
               onSubmit={async (values, { setSubmitting, setStatus }) => {
                 const trimmedName = values.newName.trim();
 
-                console.log('Отправка запроса на изменение имени проекта:', {
-                  projectId: currentProjectId,
-                  newName: trimmedName,
-                });
-
                 try {
                   setSubmitting(true);
                   setStatus(null);
 
-                  // ← Здесь подключи свой реальный запрос на обновление имени
-                  // await updateProjectName({ projectId: currentProjectId, newName: trimmedName });
-
-                  // Симуляция успеха (удали, когда подключишь API)
-                  // await new Promise(resolve => setTimeout(resolve, 800));
-
                   setStatus({ success: true });
                   setTimeout(() => setCurrentPage('main'), 800);
                 } catch (error: any) {
-                  console.error('Ошибка при изменении имени:', error);
                   setStatus({
                     error: error?.message || 'Failed to update project name. Please try again.',
                   });
@@ -235,16 +241,21 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
       case 'archive-confirm':
         return (
           <div className={styles.page}>
-            <button onClick={() => setCurrentPage('main')} className={styles.page__backButton}>
+            <button onClick={() => setCurrentPage('main')} className={styles.page__backButton} disabled={isArchiving}>
               ← Back
             </button>
             <h3 className={styles.page__title}>Are you sure you want to archive this project?</h3>
             <div className={styles.page__buttons}>
-              <button onClick={handleArchive} className={`${styles.page__button} ${styles['page__button--primary']}`}>
-                Sure
+              <button
+                onClick={handleArchive}
+                disabled={isArchiving}
+                className={`${styles.page__button} ${styles['page__button--primary']}`}
+              >
+                {isArchiving ? 'Archiving...' : 'Sure'}
               </button>
               <button
                 onClick={() => setCurrentPage('main')}
+                disabled={isArchiving}
                 className={`${styles.page__button} ${styles['page__button--secondary']}`}
               >
                 Cancel
@@ -258,6 +269,33 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
           <div className={styles.page}>
             <h3 className={styles.page__title}>The project has been archived!</h3>
             <img style={{ width: 128, height: 128, alignSelf: 'center' }} src='/docs.svg' alt='Archived' />
+            <p style={{ textAlign: 'center', color: '#666', marginTop: '20px' }}>
+              This window will close automatically...
+            </p>
+          </div>
+        );
+
+      case 'archive-error':
+        return (
+          <div className={styles.page}>
+            <button onClick={() => setCurrentPage('archive-confirm')} className={styles.page__backButton}>
+              ← Back
+            </button>
+
+            <h3 className={styles.page__title} style={{ color: '#ff4444' }}>
+              Failed to archive project
+            </h3>
+
+            <p style={{ textAlign: 'center', color: '#ff4444', fontSize: '15px', margin: '20px 0' }}>{archiveError}</p>
+
+            <div className={styles.page__buttons}>
+              <button
+                onClick={() => setCurrentPage('main')}
+                className={`${styles.page__button} ${styles['page__button--secondary']}`}
+              >
+                Back to Settings
+              </button>
+            </div>
           </div>
         );
 
