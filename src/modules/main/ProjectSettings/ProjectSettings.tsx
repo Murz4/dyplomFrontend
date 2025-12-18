@@ -173,8 +173,6 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
               initialValues={{ newName: currentProjectName }}
               validationSchema={validationSchema}
               onSubmit={async (values, { setSubmitting, setStatus }) => {
-                const trimmedName = values.newName.trim();
-
                 try {
                   setSubmitting(true);
                   setStatus(null);
