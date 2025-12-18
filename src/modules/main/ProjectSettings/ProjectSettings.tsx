@@ -172,7 +172,7 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
             <Formik
               initialValues={{ newName: currentProjectName }}
               validationSchema={validationSchema}
-              onSubmit={async (values, { setSubmitting, setStatus }) => {
+              onSubmit={async (_values, { setSubmitting, setStatus }) => {
                 try {
                   setSubmitting(true);
                   setStatus(null);
