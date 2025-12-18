@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@common/store/hooks';
-import styles from './InviteHandlerPage.module.scss';
+import styles from './inviteHandlerPage.module.scss';
 import { getJoinLink } from 'src/api/getJoinLink';
 
 type Status = 'loading' | 'success' | 'error' | 'redirecting';
