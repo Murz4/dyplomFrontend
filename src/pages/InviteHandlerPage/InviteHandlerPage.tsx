@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@common/store/hooks';
 import styles from './inviteHandlerPage.module.scss';
-import { getJoinLink } from 'src/api/getJoinLink';
+import { postJoinByCode } from 'src/api/postJoinByCode';
 
 type Status = 'loading' | 'success' | 'error' | 'redirecting';
 
@@ -26,7 +26,7 @@ export const InviteHandlerPage = () => {
 
     const performJoin = async () => {
       try {
-        const message = await getJoinLink(token);
+        const message = await postJoinByCode(token);
 
         const successMessage = typeof message === 'string' ? message : 'You have successfully joined the project!';
 
