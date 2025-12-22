@@ -5,7 +5,7 @@ import { HeaderButton } from '@modules/header/HeaderButton/HeaderButton';
 import { CustomInput } from '@common/components/CustomInput/CustomInput';
 import { ArchivedProjectItem } from '@modules/settings/ArchivedProjectItem';
 import { useAppDispatch, useAppSelector } from '@common/store/hooks';
-import { getProjects } from '@common/store/slicer/getProjectsSlice';
+import { getProjects, removeProject, resetProjects } from '@common/store/slicer/getProjectsSlice';
 import styles from './settingsPage.module.scss';
 import { patchArchive } from 'src/api/patchArchive';
 
@@ -30,16 +30,79 @@ const changePasswordSchema = Yup.object({
 export const SettingsPage = () => {
   const [activeSection, setActiveSection] = useState<'archive' | 'name' | 'email' | 'password' | null>(null);
   const [restoringId, setRestoringId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Локальная ошибка (например, от restore)
 
   const overlayRef = useRef<HTMLDivElement>(null);
-  const dispatch = useAppDispatch();
-  const projects = useAppSelector(state => state.projects);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
-  const archivedProjects = projects.items.filter(project => project.is_archived === true);
+  const dispatch = useAppDispatch();
+  const projectsState = useAppSelector(state => state.projects);
+
+  const archivedProjects = projectsState.items.filter(project => project.is_archived);
 
   const handleClose = () => setActiveSection(null);
+
+  useLayoutEffect(() => {
+    if (activeSection === 'archive') {
+      setError(null);
+      dispatch(resetProjects());
+      dispatch(getProjects({ limit: 10 }));
+    }
+  }, [activeSection, dispatch]);
+
+  const loadMoreArchived = async () => {
+    if (isLoadingMore || !projectsState.hasMore || !projectsState.nextCursor || projectsState.loading) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+    try {
+      await dispatch(getProjects({ cursor: projectsState.nextCursor, limit: 10 })).unwrap();
+    } catch (err) {
+      console.error('Failed to load more archived projects:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    const currentTarget = observerTarget.current;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && projectsState.hasMore && !projectsState.loading && !isLoadingMore) {
+          loadMoreArchived();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [projectsState.hasMore, projectsState.loading, projectsState.nextCursor, isLoadingMore]);
+
+  const handleRestore = async (projectId: number) => {
+    setRestoringId(projectId);
+    setError(null);
+
+    try {
+      await patchArchive({ project_id: projectId, is_archived: false });
+      dispatch(removeProject(projectId));
+    } catch (err: any) {
+      console.error('Failed to restore project:', err);
+      setError(err.message || 'Failed to restore project');
+    } finally {
+      setRestoringId(null);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,37 +122,6 @@ export const SettingsPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [activeSection]);
-
-  useLayoutEffect(() => {
-    if (activeSection === 'archive') {
-      const fetchProjects = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Failed to load projects');
-          console.error('Error fetching projects:', err);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchProjects();
-    }
-  }, [activeSection, dispatch]);
-
-  const handleRestore = async (projectId: number) => {
-    setRestoringId(projectId);
-    try {
-      patchArchive({ project_id: projectId, is_archived: false });
-      await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
-    } catch (err) {
-      console.error('Failed to restore project:', err);
-    } finally {
-      setRestoringId(null);
-    }
-  };
 
   return (
     <div className={styles.container}>
@@ -152,23 +184,24 @@ export const SettingsPage = () => {
               <div className={styles.container__archiveSection}>
                 <h2 className={styles.container__title}>Project Archive</h2>
 
-                {loading && (
+                {projectsState.loading && archivedProjects.length === 0 && (
                   <div className={styles.container__loadingState}>
                     <div className={styles.container__spinner} />
                     <p className={styles.container__loadingText}>Loading archived projects...</p>
                   </div>
                 )}
 
-                {error && !loading && (
+                {(projectsState.error || error) && (
                   <div className={styles.container__errorState}>
-                    <div className={styles.container__errorIcon}>Warning</div>
+                    <div className={styles.container__errorIcon}>⚠️</div>
                     <h3 className={styles.container__errorTitle}>Oops! Something went wrong</h3>
-                    <p className={styles.container__errorMessage}>{error}</p>
+                    <p className={styles.container__errorMessage}>{error || projectsState.error}</p>
                     <button
                       className={styles.container__retryButton}
                       onClick={() => {
                         setError(null);
-                        dispatch(getProjects({ cursor: 0, limit: 50 }));
+                        dispatch(resetProjects());
+                        dispatch(getProjects({ limit: 10 }));
                       }}
                     >
                       Try Again
@@ -176,9 +209,9 @@ export const SettingsPage = () => {
                   </div>
                 )}
 
-                {!loading && !error && archivedProjects.length === 0 && (
+                {!projectsState.loading && !projectsState.error && !error && archivedProjects.length === 0 && (
                   <div className={styles.container__emptyState}>
-                    <div className={styles.container__emptyIcon}>Folder</div>
+                    <div className={styles.container__emptyIcon}>📁</div>
                     <h3 className={styles.container__emptyTitle}>No archived projects</h3>
                     <p className={styles.container__emptyDescription}>
                       All your projects are active. Archive one to see it here.
@@ -186,17 +219,29 @@ export const SettingsPage = () => {
                   </div>
                 )}
 
-                {!loading && !error && archivedProjects.length > 0 && (
+                {!projectsState.loading && !projectsState.error && !error && archivedProjects.length > 0 && (
                   <div className={styles.container__archiveList}>
                     {archivedProjects.map(project => (
                       <ArchivedProjectItem
                         key={project.id}
                         projectName={project.name}
-                        creatorName={project.creator.full_name || 'Unknown'}
+                        creatorName={project.creator.name || 'Unknown'}
+                        creatorSurname={project.creator.surname || 'Unknown'}
                         onRestore={() => handleRestore(project.id)}
                         isRestoring={restoringId === project.id}
                       />
                     ))}
+
+                    {projectsState.hasMore && (
+                      <div ref={observerTarget} className={styles.loadMoreTrigger}>
+                        {isLoadingMore && (
+                          <div className={styles.container__loadingMore}>
+                            <div className={styles.container__spinner} />
+                            <p>Loading more archived projects...</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

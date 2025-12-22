@@ -3,7 +3,8 @@
   height: calc(100vh - 80px);
   background-color: #ffb600;
   position: relative;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   background-image: url('/public/artBoardMain.png');
   background-size: cover;
   background-repeat: no-repeat;

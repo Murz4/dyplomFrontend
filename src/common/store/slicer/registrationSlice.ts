@@ -15,11 +15,7 @@ const initialState: RegisterState = {
 
 export const register = createAsyncThunk(
   'register/registerFetch',
-  async (credentials: { full_name: string; email: string; password: string }, thunkAPI) => {
-    console.log(5);
-    console.log(credentials.full_name);
-    console.log(credentials.email);
-    console.log(credentials.password);
+  async (credentials: { name: string; surname: string; email: string; password: string }, thunkAPI) => {
     try {
       const response = await apiClient.post('/user/register', credentials);
       console.log(response.data);

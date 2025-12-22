@@ -5,9 +5,11 @@ import styles from './participantsModal.module.scss';
 interface Participant {
   user: {
     id: number;
-    full_name: string;
+    name: string;
+    surname: string;
     email: string;
   };
+  role: string;
 }
 
 interface ParticipantsModalProps {
@@ -78,7 +80,9 @@ export const ParticipantsModal = ({ onClosed, participants, loading = false }: P
                         />
                       </svg>
                     </div>
-                    <span className={styles.container__participantName}>{participant.user.full_name}</span>
+                    <span className={styles.container__participantName}>
+                      {participant.user.name} {participant.user.surname}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -122,11 +126,13 @@ export const ParticipantsModal = ({ onClosed, participants, loading = false }: P
                 </svg>
               </div>
 
-              <h2 className={styles.container__name}>{selectedParticipant.user.full_name}</h2>
+              <h2 className={styles.container__name}>
+                {selectedParticipant.user.name} {selectedParticipant.user.surname}
+              </h2>
               <p className={styles.container__email}>{selectedParticipant.user.email}</p>
 
               <div className={styles.container__roleBadge}>
-                <span className={styles.container__roleText}>{selectedParticipant.user.full_name}</span>
+                <span className={styles.container__roleText}>{selectedParticipant.role}</span>
               </div>
             </div>
           </div>

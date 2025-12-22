@@ -193,9 +193,9 @@ export const AuthPage = ({ mode }: IAuthPageProps) => {
       setSuccessMessage('');
       setErrorMessage('');
 
-      const full_name: string = `${values.name}${values.surname}`;
-
-      await dispatch(register({ full_name: full_name, email: values.email, password: values.password })).unwrap();
+      await dispatch(
+        register({ name: values.name, surname: values.surname, email: values.email, password: values.password })
+      ).unwrap();
 
       console.log('Registration values:', values);
       setSuccessMessage('Registration successful!');

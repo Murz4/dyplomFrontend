@@ -6,7 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RiMenu3Line } from 'react-icons/ri';
-import { MdSpaceDashboard, MdHome, MdSettings } from 'react-icons/md';
+import { MdSpaceDashboard, MdHome, MdSettings, MdKeyboardArrowDown } from 'react-icons/md';
 import styles from './header.module.scss';
 import { StepItem } from '../StepItem/StepItem';
 import { DropDown } from '../DropDown/DropDown';
@@ -18,23 +18,20 @@ import { useAppDispatch } from '@common/store/hooks';
 import { getProjects } from '@common/store/slicer/getProjectsSlice';
 import { getUserName } from 'src/api/getUserName';
 import { postJoinByCode } from 'src/api/postJoinByCode';
+import { logout } from '@common/store/slicer/userSlice';
 
 const step1ValidationSchema = Yup.object({
   projectName: Yup.string().min(3, 'Min 3 symbols').max(50, 'Max 50 symbols').required('Project name is required'),
 });
-
 const step2ValidationSchema = Yup.object({
   category: Yup.number().required('Select Category'),
 });
-
 const step3ValidationSchema = Yup.object({
   participants: Yup.array().of(Yup.string()),
 });
-
 const step4ValidationSchema = Yup.object({
   details: Yup.string().max(500, 'Max 500 symbols'),
 });
-
 const joinValidationSchema = Yup.object({
   code: Yup.string().trim().required('Enter the project code'),
 });
@@ -61,10 +58,28 @@ export const Header = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const totalSteps = 4;
   const dispatch = useAppDispatch();
-
   const isOnMainPage = location.pathname === '/';
   const isOnCalendar = location.pathname === '/calendar';
   const isOnSettings = location.pathname === '/settings';
+
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const userBlockRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userBlockRef.current && !userBlockRef.current.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    if (isUserDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserDropdownOpen]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -101,11 +116,11 @@ export const Header = () => {
     };
   }, [isMenuOpen]);
 
-  const [userName, setUserName] = useState<any>(null);
+  const [userName, setUserName] = useState<any>('');
   useLayoutEffect(() => {
     const loadUserName = async () => {
       const data = await getUserName();
-      setUserName(data.full_name);
+      setUserName(data);
     };
     loadUserName();
   }, []);
@@ -134,7 +149,6 @@ export const Header = () => {
       description: finalData.details,
       users: finalData.participants,
     };
-
     try {
       await postProject(payload);
       await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
@@ -286,6 +300,50 @@ export const Header = () => {
                   <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>Settings</span>
                 </div>
               )}
+
+              <div style={{ height: '1px', backgroundColor: '#ccc', margin: '12px 0' }} />
+
+              <div
+                onClick={() => {
+                  setIsClosed(false);
+                  setIsMenuOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '12px',
+                  backgroundColor: '#C5DCFF',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  color: '#333',
+                }}
+              >
+                Create project
+              </div>
+
+              <div
+                onClick={() => {
+                  setModalJoin(true);
+                  setIsMenuOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '12px',
+                  backgroundColor: '#C5DCFF',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  color: '#333',
+                }}
+              >
+                Join project
+              </div>
             </div>
           </div>
         )}
@@ -337,32 +395,41 @@ export const Header = () => {
         </nav>
 
         <div
-          style={{
-            backgroundColor: '#C5DCFF',
-            height: 30,
-            borderRadius: 5,
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 7px',
-          }}
+          ref={userBlockRef}
+          className={styles.container__userBlock}
+          onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
         >
-          <p style={{ fontSize: 16, fontWeight: 600, color: '#000000' }}>{userName}</p>
+          <p style={{ fontSize: 16, fontWeight: 600, color: '#000000' }}>
+            {userName.name} {userName.surname}
+          </p>
+
+          <MdKeyboardArrowDown
+            size={25}
+            style={{
+              transition: 'transform 0.2s ease',
+              transform: isUserDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+
+          {isUserDropdownOpen && (
+            <div className={styles.container__userDropdown}>
+              <button
+                className={styles.container__logoutButton}
+                onClick={e => {
+                  e.stopPropagation();
+                  console.log('Logout clicked');
+                  logout();
+                  setIsUserDropdownOpen(false);
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
 
         {!isOnSettings && (
-          <div
-            style={{
-              height: 30,
-              width: 45,
-              display: 'flex',
-              alignItems: 'center',
-              cursor: 'pointer',
-              justifyContent: 'center',
-              backgroundColor: '#C5DCFF',
-              borderRadius: 5,
-            }}
-            onClick={() => navigate('/settings')}
-          >
+          <div className={styles.container__settingsBlock} onClick={() => navigate('/settings')}>
             <img width={23} height={23} src='/settingIcon.svg' alt='settings icon' />
           </div>
         )}
@@ -420,7 +487,6 @@ export const Header = () => {
                 )}
               </Formik>
             )}
-
             {stepCount === 2 && (
               <Formik
                 initialValues={{ category: formData.category }}
@@ -502,7 +568,6 @@ export const Header = () => {
                 )}
               </Formik>
             )}
-
             {stepCount === 3 && (
               <Formik
                 initialValues={{ participants: formData.participants }}
@@ -642,7 +707,6 @@ export const Header = () => {
                 )}
               </Formik>
             )}
-
             {stepCount === 4 && (
               <Formik
                 initialValues={{ details: formData.details }}
@@ -708,11 +772,8 @@ export const Header = () => {
             onSubmit={async (values, { setSubmitting, resetForm }) => {
               setJoinError('');
               setSubmitting(true);
-
               try {
-                console.log('code', values.code);
                 await postJoinByCode(values.code.trim());
-
                 setModalJoin(false);
                 resetForm();
                 await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
@@ -738,7 +799,6 @@ export const Header = () => {
                 }}
               >
                 <p style={{ fontSize: 28, fontWeight: 600, textAlign: 'center' }}>Join the project</p>
-
                 <div
                   style={{
                     width: '100%',
@@ -763,11 +823,9 @@ export const Header = () => {
                   </ErrorMessage>
                   <p style={{ fontSize: 20, textDecoration: 'underline', color: 'black' }}>Enter the project code</p>
                 </div>
-
                 {joinError && (
                   <p style={{ color: 'red', fontSize: 16, textAlign: 'center', maxWidth: 400 }}>{joinError}</p>
                 )}
-
                 <HeaderButton
                   type='submit'
                   disabled={isSubmitting}

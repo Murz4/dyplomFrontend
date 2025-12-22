@@ -3,12 +3,20 @@ import styles from './projectComponentStyle.module.scss';
 interface IProjectComponent {
   name: string;
   creatorName: string;
+  creatorSurname: string;
   onClick?: () => void;
   onClickUsers?: () => void;
   onClickSettings?: () => void;
 }
 
-export const ProjectComponent = ({ name, onClick, onClickUsers, onClickSettings, creatorName }: IProjectComponent) => (
+export const ProjectComponent = ({
+  name,
+  onClick,
+  onClickUsers,
+  onClickSettings,
+  creatorName,
+  creatorSurname,
+}: IProjectComponent) => (
   <div className={styles.container}>
     <button onClick={onClick} className={styles.container__button}>
       <p className={styles.container__buttonText}>{name}</p>
@@ -33,7 +41,10 @@ export const ProjectComponent = ({ name, onClick, onClickUsers, onClickSettings,
         />
       </div>
       <p style={{ fontSize: 20, color: 'black', fontWeight: 500 }}>
-        creator: <span style={{ fontSize: 20, color: 'orange', fontWeight: 'bold' }}>{creatorName}</span>
+        creator:
+        <span style={{ fontSize: 20, color: 'orange', fontWeight: 'bold' }}>
+          {creatorName} {creatorSurname}
+        </span>
       </p>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styles from './mainPage.module.scss';
 import { ProjectComponent } from '@modules/main/ProjectComponent/ProjectComponent';
 import { useAppDispatch, useAppSelector } from '@common/store/hooks';
@@ -18,7 +18,27 @@ export const MainPage = () => {
   const dispatch = useAppDispatch();
   const [participants, setParticipants] = useState([]);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const observerTarget = useRef(null);
+  const hasInitialized = useRef(false);
+
   const filteredProjectsArray = projects.items.filter(item => item.is_archived === false);
+
+  const loadMoreProjects = async () => {
+    if (isLoadingMore || !projects.hasMore || !projects.nextCursor) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+    try {
+      await dispatch(getProjects({ cursor: projects.nextCursor, limit: 10 })).unwrap();
+    } catch (err) {
+      console.error('Error loading more projects:', err);
+      toast.error('Failed to load more projects');
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     const pendingToken = localStorage.getItem('pendingInviteToken');
@@ -41,7 +61,7 @@ export const MainPage = () => {
           icon: '✅',
         });
 
-        dispatch(getProjects({ cursor: 0, limit: 10 }));
+        dispatch(getProjects({ limit: 10 }));
       })
       .catch((error: any) => {
         console.error('[MainPage] Ошибка присоединения:', error.response?.data || error);
@@ -92,11 +112,15 @@ export const MainPage = () => {
       });
   }, [dispatch]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (hasInitialized.current) {
+      return;
+    }
+
     const fetchProjects = async () => {
       try {
-        console.log(24);
-        await dispatch(getProjects({ cursor: 0, limit: 10 })).unwrap();
+        await dispatch(getProjects({ limit: 10 })).unwrap();
+        hasInitialized.current = true;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching projects:', err);
@@ -104,7 +128,30 @@ export const MainPage = () => {
     };
 
     fetchProjects();
-  }, [filteredProjectsArray.length]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    const currentTarget = observerTarget.current;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && projects.hasMore && !projects.loading && !isLoadingMore) {
+          loadMoreProjects();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [projects.hasMore, projects.loading, projects.nextCursor, isLoadingMore, loadMoreProjects]);
 
   const handleClickProject = (index: number) => {
     console.log(index);
@@ -117,20 +164,20 @@ export const MainPage = () => {
       const membersArray = await getProjectMembers(index);
       console.log(index);
       setParticipants(membersArray);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading members:', error.message);
       setParticipants([]);
     } finally {
       setLoadingMembers(false);
     }
   };
+
   const handleClickSettings = async (index: number, name: string) => {
     await dispatch(setProject({ id: index, name: name }));
-
     setShowSettingsModal(true);
   };
 
-  if (projects.loading) {
+  if (projects.loading && filteredProjectsArray.length === 0) {
     return (
       <div className={styles.container}>
         <div className={styles.container__main}>
@@ -166,7 +213,7 @@ export const MainPage = () => {
     );
   }
 
-  if (filteredProjectsArray.length === 0) {
+  if (filteredProjectsArray.length === 0 && !projects.loading) {
     return (
       <div className={styles.container}>
         <div className={styles.container__main}>
@@ -199,13 +246,26 @@ export const MainPage = () => {
           <ProjectComponent
             onClickUsers={() => handleClickParticipants(item.id)}
             onClick={() => handleClickProject(index)}
-            creatorName={item.creator.full_name}
+            creatorName={item.creator.name}
+            creatorSurname={item.creator.surname}
             onClickSettings={() => handleClickSettings(item.id, item.name)}
             name={item.name}
             key={item.id}
           />
         ))}
+
+        {projects.hasMore && (
+          <div ref={observerTarget} className={styles.loadMoreTrigger}>
+            {isLoadingMore && (
+              <div className={styles.loadingMore}>
+                <div className={styles.spinner} />
+                <p className={styles.loadingText}>Loading more projects...</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
       {showParticipantsModal && (
         <ParticipantsModal
           onClosed={() => {

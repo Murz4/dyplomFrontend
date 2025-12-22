@@ -5,6 +5,7 @@ import styles from './archivedProjectItem.module.scss';
 interface ArchivedProjectItemProps {
   projectName: string;
   creatorName: string;
+  creatorSurname: string;
   onRestore: () => void;
   isRestoring?: boolean;
 }
@@ -12,6 +13,7 @@ interface ArchivedProjectItemProps {
 export const ArchivedProjectItem: React.FC<ArchivedProjectItemProps> = ({
   projectName,
   creatorName,
+  creatorSurname,
   onRestore,
   isRestoring = false,
 }) => (
@@ -19,7 +21,10 @@ export const ArchivedProjectItem: React.FC<ArchivedProjectItemProps> = ({
     <div className={styles.container__info}>
       <h3 className={styles.container__projectName}>{projectName}</h3>
       <p className={styles.container__creator}>
-        Created by <span className={styles.container__creatorName}>{creatorName}</span>
+        Created by
+        <span className={styles.container__creatorName}>
+          {creatorName} {creatorSurname}
+        </span>
       </p>
     </div>
 
