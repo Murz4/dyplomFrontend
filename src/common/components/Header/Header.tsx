@@ -417,8 +417,7 @@ export const Header = () => {
                 className={styles.container__logoutButton}
                 onClick={e => {
                   e.stopPropagation();
-                  console.log('Logout clicked');
-                  logout();
+                  dispatch(logout());
                   setIsUserDropdownOpen(false);
                 }}
               >

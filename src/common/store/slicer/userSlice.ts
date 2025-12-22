@@ -48,7 +48,7 @@ export const refreshAccessToken = createAsyncThunk('user/refreshToken', async (_
 export const logout = createAsyncThunk('user/logout', async (_, thunkAPI) => {
   console.log(1);
   try {
-    await apiClient.post('/user/logout', {});
+    await apiClient.post('/user/logout');
     console.log(2);
   } catch (error) {
     console.error('Logout error:', error);
