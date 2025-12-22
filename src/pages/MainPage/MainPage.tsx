@@ -8,7 +8,6 @@ import { getProjectMembers } from 'src/api/getProjectMembers';
 import { ProjectSettings } from '@modules/main/ProjectSettings/ProjectSettings';
 import { setProject } from '@common/store/slicer/projectDataSlice';
 import toast from 'react-hot-toast';
-import { getJoinLink } from 'src/api/getJoinLink';
 import { postJoinByCode } from 'src/api/postJoinByCode';
 
 export const MainPage = () => {
