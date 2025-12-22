@@ -9,6 +9,7 @@ import { ProjectSettings } from '@modules/main/ProjectSettings/ProjectSettings';
 import { setProject } from '@common/store/slicer/projectDataSlice';
 import toast from 'react-hot-toast';
 import { getJoinLink } from 'src/api/getJoinLink';
+import { postJoinByCode } from 'src/api/postJoinByCode';
 
 export const MainPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export const MainPage = () => {
       return;
     }
 
-    getJoinLink(pendingToken)
+    postJoinByCode(pendingToken)
       .then(response => {
         const successMessage =
           typeof response.data === 'string' ? response.data : 'You have successfully joined the project!';
