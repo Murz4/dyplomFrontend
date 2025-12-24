@@ -1,13 +1,13 @@
 import apiClient from './instances';
 
-interface IChangeNameProps {
-  name: string;
-  surname: string;
+interface IDeleteUserFromProjectProps {
+  project_id: number | null;
+  user_id: number | null;
 }
 
-export const patchChangeName = async ({ name, surname }: IChangeNameProps) => {
+export const deleteUserFromProject = async ({ project_id, user_id }: IDeleteUserFromProjectProps) => {
   try {
-    const response = await apiClient.patch('/user/profile/me/change_username', { name: name, surname: surname });
+    const response = await apiClient.delete(`/projects/${project_id}/users/${user_id}`);
     return response.data;
   } catch (error: any) {
     console.error('error:', error);

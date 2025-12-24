@@ -201,12 +201,31 @@
       height: 34px;
       max-width: 156px;
       background-color: #ff6773;
-      color: white;
       font-weight: 600;
 
       &:hover {
         background-color: #ff5252;
       }
+    }
+  }
+
+  &__leaveProject {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 25px;
+    padding-right: 8px;
+    height: 34px;
+    max-width: 156px;
+    background-color: #ff69b4;
+    color: #1a1a1a;
+    border-width: 0px;
+    font-size: 14px;
+    font-weight: 500;
+
+    &:hover {
+      background-color: #ff1493;
     }
   }
 }

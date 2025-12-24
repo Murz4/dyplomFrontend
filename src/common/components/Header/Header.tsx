@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Modal } from '@modules/main/Modal/Modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, data } from 'react-router-dom';
 import { RiMenu3Line } from 'react-icons/ri';
 import { MdSpaceDashboard, MdHome, MdSettings, MdKeyboardArrowDown } from 'react-icons/md';
 import styles from './header.module.scss';
@@ -14,11 +14,11 @@ import { CustomInput } from '../CustomInput/CustomInput';
 import { getPurposes } from 'src/api/getPurposes';
 import { IoAddOutline } from 'react-icons/io5';
 import { postProject, ProjectPayload } from 'src/api/postProject';
-import { useAppDispatch } from '@common/store/hooks';
+import { useAppDispatch, useAppSelector } from '@common/store/hooks';
 import { getProjects } from '@common/store/slicer/getProjectsSlice';
-import { getUserName } from 'src/api/getUserName';
 import { postJoinByCode } from 'src/api/postJoinByCode';
 import { logout } from '@common/store/slicer/userSlice';
+import { getUserName } from '@common/store/slicer/fullNameSlice';
 
 const step1ValidationSchema = Yup.object({
   projectName: Yup.string().min(3, 'Min 3 symbols').max(50, 'Max 50 symbols').required('Project name is required'),
@@ -116,14 +116,12 @@ export const Header = () => {
     };
   }, [isMenuOpen]);
 
-  const [userName, setUserName] = useState<any>('');
+  const data = useAppSelector(state => state.fullName);
+
   useLayoutEffect(() => {
-    const loadUserName = async () => {
-      const data = await getUserName();
-      setUserName(data);
-    };
-    loadUserName();
-  }, []);
+    dispatch(getUserName());
+    console.log(1);
+  }, [dispatch]);
 
   const handleNext = (values: any) => {
     setFormData({ ...formData, ...values });
@@ -400,7 +398,7 @@ export const Header = () => {
           onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
         >
           <p style={{ fontSize: 16, fontWeight: 600, color: '#000000' }}>
-            {userName.name} {userName.surname}
+            {data.name} {data.surname}
           </p>
 
           <MdKeyboardArrowDown

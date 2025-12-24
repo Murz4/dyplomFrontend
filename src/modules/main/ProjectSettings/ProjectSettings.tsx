@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
 import styles from './projectSettings.module.scss';
-import { FaKey, FaPen, FaTrashAlt } from 'react-icons/fa';
+import { FaPen, FaTrashAlt } from 'react-icons/fa';
 import { GoCheckbox } from 'react-icons/go';
 import { useAppDispatch, useAppSelector } from '@common/store/hooks';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { GiExitDoor } from 'react-icons/gi';
 import * as Yup from 'yup';
 import { deleteProject } from 'src/api/deleteProject';
 import { clearProject } from '@common/store/slicer/projectDataSlice';
-import { removeProject } from '@common/store/slicer/getProjectsSlice';
+import { getProjects, removeProject } from '@common/store/slicer/getProjectsSlice';
 import { patchArchive } from 'src/api/patchArchive';
+import { leaveProject } from 'src/api/leaveProject';
 
 type PageType =
   | 'main'
@@ -20,7 +22,8 @@ type PageType =
   | 'delete-confirm-1'
   | 'delete-confirm-2'
   | 'delete-success'
-  | 'delete-error';
+  | 'delete-error'
+  | 'leave-error';
 
 interface ProjectSettingsProps {
   onClosed: () => void;
@@ -37,6 +40,8 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isArchiving, setIsArchiving] = useState(false);
   const [archiveError, setArchiveError] = useState<string | null>(null);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
 
   const handleArchive = async () => {
     if (!currentProjectId) {
@@ -55,15 +60,17 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
         onClosed();
         dispatch(clearProject());
       }, 500);
-    } catch (error: any) {
+    } catch (err: any) {
       let errorMessage = 'Failed to archive project. Please try again.';
 
-      if (error?.response?.status === 403) {
+      if (err?.response?.status === 403) {
         errorMessage = 'You do not have permission to archive this project.';
-      } else if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
+      } else if (err?.response?.data?.detail) {
+        errorMessage = err.response.data.detail;
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
       }
 
       setArchiveError(errorMessage);
@@ -93,21 +100,53 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
         onClosed();
         dispatch(clearProject());
       }, 500);
-    } catch (error: any) {
+    } catch (err: any) {
       let errorMessage = 'Failed to delete project. Please try again.';
 
-      if (error?.response?.status === 403) {
+      if (err?.response?.status === 403) {
         errorMessage = 'You are not the owner of this project and cannot delete it.';
-      } else if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
+      } else if (err?.response?.data?.detail) {
+        errorMessage = err.response.data.detail;
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
       }
-
       setDeleteError(errorMessage);
       setCurrentPage('delete-error');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleLeaveProject = async () => {
+    setIsLeaving(true);
+    setLeaveError(null);
+
+    try {
+      await leaveProject(currentProjectId);
+      await dispatch(getProjects({ limit: 10 }));
+      dispatch(clearProject());
+      onClosed();
+    } catch (err: any) {
+      console.error('Failed to leave project:', err);
+
+      let errorMessage = 'Failed to leave project. Please try again.';
+
+      if (err?.response?.status === 403) {
+        errorMessage = 'You do not have permission to leave this project.';
+      } else if (err?.response?.data?.detail) {
+        errorMessage = err.response.data.detail;
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
+      setLeaveError(errorMessage);
+      setCurrentPage('leave-error');
+    } finally {
+      setIsLeaving(false);
     }
   };
 
@@ -131,10 +170,6 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
                 <FaPen />
                 <p>Project Name: {currentProjectName}</p>
               </button>
-              <button className={styles.settings__item}>
-                <FaKey />
-                <p>Project Access Settings</p>
-              </button>
               <button
                 onClick={() => setCurrentPage('archive-confirm')}
                 className={`${styles.settings__item} ${styles['settings__item--complete']}`}
@@ -144,13 +179,18 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
                   <p style={{ fontSize: 14, fontWeight: '500', color: 'black', marginTop: 2 }}>Complete Project</p>
                 </div>
               </button>
+              <button onClick={handleLeaveProject} className={styles.settings__leaveProject} disabled={isLeaving}>
+                <GiExitDoor size={20} />
+                {isLeaving ? 'Leaving...' : 'Leave the project'}
+              </button>
+
               <button
                 onClick={() => setCurrentPage('delete-confirm-1')}
                 className={`${styles.settings__item} ${styles['settings__item--delete']}`}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <FaTrashAlt size={16} color='white' />
-                  <p style={{ fontSize: 14, fontWeight: '500', color: 'white', marginTop: 2 }}>Delete Project</p>
+                  <FaTrashAlt size={16} color='#1a1a1a' />
+                  <p style={{ fontSize: 14, fontWeight: '500', color: '#1a1a1a', marginTop: 2 }}>Delete Project</p>
                 </div>
               </button>
             </div>
@@ -387,6 +427,30 @@ export const ProjectSettings = ({ onClosed }: ProjectSettingsProps) => {
             </h3>
 
             <p style={{ textAlign: 'center', color: '#ff4444', fontSize: '15px', margin: '20px 0' }}>{deleteError}</p>
+
+            <div className={styles.page__buttons}>
+              <button
+                onClick={() => setCurrentPage('main')}
+                className={`${styles.page__button} ${styles['page__button--secondary']}`}
+              >
+                Back to Settings
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'leave-error':
+        return (
+          <div className={styles.page}>
+            <button onClick={() => setCurrentPage('main')} className={styles.page__backButton}>
+              ← Back
+            </button>
+
+            <h3 className={styles.page__title} style={{ color: '#ff4444' }}>
+              Failed to leave project
+            </h3>
+
+            <p style={{ textAlign: 'center', color: '#ff4444', fontSize: '15px', margin: '20px 0' }}>{leaveError}</p>
 
             <div className={styles.page__buttons}>
               <button

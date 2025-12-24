@@ -21,7 +21,7 @@ export const ArchivedProjectItem: React.FC<ArchivedProjectItemProps> = ({
     <div className={styles.container__info}>
       <h3 className={styles.container__projectName}>{projectName}</h3>
       <p className={styles.container__creator}>
-        Created by
+        Created by{' '}
         <span className={styles.container__creatorName}>
           {creatorName} {creatorSurname}
         </span>

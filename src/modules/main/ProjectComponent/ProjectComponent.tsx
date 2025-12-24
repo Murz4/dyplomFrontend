@@ -41,7 +41,7 @@ export const ProjectComponent = ({
         />
       </div>
       <p style={{ fontSize: 20, color: 'black', fontWeight: 500 }}>
-        creator:
+        creator:{' '}
         <span style={{ fontSize: 20, color: 'orange', fontWeight: 'bold' }}>
           {creatorName} {creatorSurname}
         </span>

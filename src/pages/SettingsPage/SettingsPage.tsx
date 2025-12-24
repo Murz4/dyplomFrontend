@@ -8,6 +8,9 @@ import { useAppDispatch, useAppSelector } from '@common/store/hooks';
 import { getProjects, removeProject, resetProjects } from '@common/store/slicer/getProjectsSlice';
 import styles from './settingsPage.module.scss';
 import { patchArchive } from 'src/api/patchArchive';
+import { patchChangeName } from 'src/api/patchChangeName';
+import { getUserName } from '@common/store/slicer/fullNameSlice';
+import { patchChangePassword } from 'src/api/patchChangePassword';
 
 const changeNameSchema = Yup.object({
   firstName: Yup.string().min(2, 'Minimum 2 characters').required('Required field'),
@@ -31,7 +34,8 @@ export const SettingsPage = () => {
   const [activeSection, setActiveSection] = useState<'archive' | 'name' | 'email' | 'password' | null>(null);
   const [restoringId, setRestoringId] = useState<number | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null); // Локальная ошибка (например, от restore)
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -41,7 +45,10 @@ export const SettingsPage = () => {
 
   const archivedProjects = projectsState.items.filter(project => project.is_archived);
 
-  const handleClose = () => setActiveSection(null);
+  const handleClose = () => {
+    setActiveSection(null);
+    setSuccessMessage(null);
+  };
 
   useLayoutEffect(() => {
     if (activeSection === 'archive') {
@@ -251,10 +258,17 @@ export const SettingsPage = () => {
               <Formik
                 initialValues={{ firstName: '', lastName: '' }}
                 validationSchema={changeNameSchema}
-                onSubmit={values => {
-                  console.log('Name change:', values);
-                  alert('Name updated successfully!');
-                  handleClose();
+                onSubmit={async (values, { setSubmitting }) => {
+                  setError(null);
+                  try {
+                    await patchChangeName({ name: values.firstName, surname: values.lastName });
+                    dispatch(getUserName());
+                    handleClose();
+                  } catch (err: any) {
+                    setError(err.message || 'Invalid update name');
+                  } finally {
+                    setSubmitting(false);
+                  }
                 }}
               >
                 {({ errors, touched }) => (
@@ -280,7 +294,11 @@ export const SettingsPage = () => {
                         <div className={styles.container__error}>{errors.lastName}</div>
                       )}
                     </div>
-
+                    {error && (
+                      <div className={styles.container__error} style={{ marginBottom: '16px' }}>
+                        {error}
+                      </div>
+                    )}
                     <HeaderButton type='submit' className={styles.container__submitButton}>
                       Save Changes
                     </HeaderButton>
@@ -335,10 +353,22 @@ export const SettingsPage = () => {
               <Formik
                 initialValues={{ currentPassword: '', newPassword: '', confirmPassword: '' }}
                 validationSchema={changePasswordSchema}
-                onSubmit={values => {
-                  console.log('Password change:', values);
-                  alert('Password updated successfully!');
-                  handleClose();
+                onSubmit={async (values, { setSubmitting }) => {
+                  setError(null);
+                  try {
+                    await patchChangePassword({
+                      old_password: values.currentPassword,
+                      new_password: values.newPassword,
+                    });
+                    setSuccessMessage('Password updated successfully!');
+                    setTimeout(() => {
+                      handleClose();
+                    }, 500);
+                  } catch (err: any) {
+                    setError(err.message || 'Failed to change password');
+                  } finally {
+                    setSubmitting(false);
+                  }
                 }}
               >
                 {({ errors, touched }) => (
@@ -380,6 +410,15 @@ export const SettingsPage = () => {
                         <div className={styles.container__error}>{errors.confirmPassword}</div>
                       )}
                     </div>
+
+                    {error && (
+                      <div className={styles.container__error} style={{ marginBottom: '16px', textAlign: 'center' }}>
+                        {error}
+                      </div>
+                    )}
+                    {successMessage && (
+                      <div style={{ color: 'green', marginBottom: '16px', textAlign: 'center' }}>{successMessage}</div>
+                    )}
 
                     <HeaderButton type='submit' className={styles.container__submitButton}>
                       Update Password

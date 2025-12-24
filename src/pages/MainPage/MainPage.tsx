@@ -23,6 +23,7 @@ export const MainPage = () => {
   const hasInitialized = useRef(false);
 
   const filteredProjectsArray = projects.items.filter(item => item.is_archived === false);
+  const currentProject = useAppSelector(state => state.projectData.projectId);
 
   const loadMoreProjects = async () => {
     if (isLoadingMore || !projects.hasMore || !projects.nextCursor) {
@@ -157,10 +158,11 @@ export const MainPage = () => {
     console.log(index);
   };
 
-  const handleClickParticipants = async (index: number) => {
+  const handleClickParticipants = async (index: number, name: string) => {
     setLoadingMembers(true);
     setShowParticipantsModal(true);
     try {
+      await dispatch(setProject({ id: index, name: name }));
       const membersArray = await getProjectMembers(index);
       console.log(index);
       setParticipants(membersArray);
@@ -169,6 +171,15 @@ export const MainPage = () => {
       setParticipants([]);
     } finally {
       setLoadingMembers(false);
+    }
+  };
+
+  const handleRoleUpdated = async () => {
+    try {
+      const membersArray = await getProjectMembers(currentProject);
+      setParticipants(membersArray);
+    } catch (error: any) {
+      console.error('Error reloading members:', error.message);
     }
   };
 
@@ -244,7 +255,7 @@ export const MainPage = () => {
         </div>
         {filteredProjectsArray.map((item, index) => (
           <ProjectComponent
-            onClickUsers={() => handleClickParticipants(item.id)}
+            onClickUsers={() => handleClickParticipants(item.id, item.name)}
             onClick={() => handleClickProject(index)}
             creatorName={item.creator.name}
             creatorSurname={item.creator.surname}
@@ -273,6 +284,7 @@ export const MainPage = () => {
             setParticipants([]);
             setLoadingMembers(false);
           }}
+          onRoleUpdated={handleRoleUpdated}
           participants={participants}
           loading={loadingMembers}
         />

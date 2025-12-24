@@ -1,13 +1,17 @@
 import apiClient from './instances';
 
-interface IChangeNameProps {
-  name: string;
-  surname: string;
+interface IChangeRoleProps {
+  project_id: number | null;
+  role_id: number;
+  user_email: string;
 }
 
-export const patchChangeName = async ({ name, surname }: IChangeNameProps) => {
+export const patchChangeRole = async ({ project_id, user_email, role_id }: IChangeRoleProps) => {
   try {
-    const response = await apiClient.patch('/user/profile/me/change_username', { name: name, surname: surname });
+    const response = await apiClient.patch(`/projects/${project_id}/change-member-role`, {
+      user_email: user_email,
+      role_id: role_id,
+    });
     return response.data;
   } catch (error: any) {
     console.error('error:', error);
@@ -21,6 +25,6 @@ export const patchChangeName = async ({ name, surname }: IChangeNameProps) => {
       throw new Error(error.response.data.error);
     }
 
-    throw new Error(error.message || 'Failed to update fullname');
+    throw new Error(error.message || 'Failed to update password');
   }
 };

@@ -1,13 +1,16 @@
 import apiClient from './instances';
 
-interface IChangeNameProps {
-  name: string;
-  surname: string;
+interface IChangePasswordProps {
+  old_password: string;
+  new_password: string;
 }
 
-export const patchChangeName = async ({ name, surname }: IChangeNameProps) => {
+export const patchChangePassword = async ({ old_password, new_password }: IChangePasswordProps) => {
   try {
-    const response = await apiClient.patch('/user/profile/me/change_username', { name: name, surname: surname });
+    const response = await apiClient.patch('/user/profile/me/change_password', {
+      old_password: old_password,
+      new_password: new_password,
+    });
     return response.data;
   } catch (error: any) {
     console.error('error:', error);
@@ -21,6 +24,6 @@ export const patchChangeName = async ({ name, surname }: IChangeNameProps) => {
       throw new Error(error.response.data.error);
     }
 
-    throw new Error(error.message || 'Failed to update fullname');
+    throw new Error(error.message || 'Failed to update password');
   }
 };

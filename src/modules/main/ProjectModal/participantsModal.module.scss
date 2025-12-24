@@ -200,6 +200,7 @@
   }
 
   &__roleBadge {
+    cursor: pointer;
     padding: 10px 24px;
     background-color: #cbd5e0;
     border-radius: 20px;
@@ -219,6 +220,7 @@
     margin-top: 150px;
     text-align: center;
   }
+
   &__loadingState {
     display: flex;
     flex-direction: column;
@@ -251,5 +253,383 @@
     font-size: 16px;
     color: #4a5568;
     font-weight: 500;
+  }
+
+  &__addForm {
+    padding: 10px 20px;
+    overflow-y: auto;
+    max-height: 430px;
+    position: relative;
+  }
+
+  &__formTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    margin: 40px 0 20px 0;
+    text-align: center;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__emailsList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__emailItem {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #cbd5e0;
+    border-radius: 10px;
+    font-size: 15px;
+    color: #2d3748;
+    background-color: #ffffff;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #4299e1;
+      background-color: #fff;
+    }
+
+    &::placeholder {
+      color: #a0aec0;
+    }
+  }
+
+  &__removeButton {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: #fff5f5;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+    color: #e53e3e;
+
+    &:hover {
+      background-color: #fed7d7;
+    }
+  }
+
+  &__addEmailButton {
+    padding: 10px 16px;
+    background-color: transparent;
+    border: 2px dashed #cbd5e0;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+
+    &:hover {
+      border-color: #a0aec0;
+      background-color: #f7fafc;
+    }
+  }
+
+  &__error {
+    font-size: 13px;
+    color: #e53e3e;
+    margin-top: 4px;
+    padding-left: 4px;
+  }
+
+  &__formActions {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  &__cancelButton {
+    flex: 1;
+    padding: 12px 20px;
+    background-color: #e2e8f0;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d3748;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: #cbd5e0;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__submitButton {
+    flex: 1;
+    padding: 12px 20px;
+    background-color: #4299e1;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: #3182ce;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__roleForm {
+    margin-top: 30px;
+    width: 100%;
+    max-width: 340px;
+  }
+
+  &__roleFormGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__roleLabel {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  &__roleSelect {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__roleOption {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background-color: #ffffff;
+    border: 2px solid #cbd5e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: #4299e1;
+      background-color: #f7fafc;
+    }
+
+    &:has(input:checked) {
+      border-color: #4299e1;
+      background-color: #ebf8ff;
+    }
+  }
+
+  &__roleRadio {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #4299e1;
+  }
+
+  &__roleOptionText {
+    font-size: 15px;
+    color: #2d3748;
+    font-weight: 500;
+  }
+
+  &__saveRoleButton {
+    width: 100%;
+    padding: 14px 20px;
+    background-color: #4299e1;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 20px;
+
+    &:hover:not(:disabled) {
+      background-color: #3182ce;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: #cbd5e0;
+    }
+  }
+
+  &__success {
+    font-size: 14px;
+    color: #38a169;
+    background-color: #f0fff4;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-top: 12px;
+    border: 1px solid #9ae6b4;
+  }
+
+  &__roleChangeView {
+    padding: 10px 20px;
+    position: relative;
+  }
+
+  &__roleChangeBackButton {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #e8f0fa;
+    }
+  }
+
+  &__roleChangeTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    margin: 40px 0 24px 0;
+  }
+
+  &__currentRoleInfo {
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 0 20px;
+  }
+
+  &__currentRoleLabel {
+    margin-top: 5px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 15px;
+  }
+
+  &__currentRoleBadge {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: #cbd5e0;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  &__deleteConfirmView {
+    padding: 10px 20px;
+    overflow-y: auto;
+    max-height: 430px;
+    position: relative;
+  }
+
+  &__deleteConfirmContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+    text-align: center;
+  }
+
+  &__deleteIcon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  &__deleteConfirmTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 12px 0;
+  }
+
+  &__deleteConfirmText {
+    font-size: 15px;
+    color: #4a5568;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    max-width: 320px;
+
+    strong {
+      color: #2d3748;
+      font-weight: 600;
+    }
+  }
+
+  &__deleteConfirmActions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    max-width: 320px;
+    margin-top: 10px;
+  }
+
+  &__deleteConfirmButton {
+    flex: 1;
+    padding: 12px 20px;
+    background-color: #e53e3e;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: #c53030;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   }
 }
