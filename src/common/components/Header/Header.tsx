@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Modal } from '@modules/main/Modal/Modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate, useLocation, data } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { RiMenu3Line } from 'react-icons/ri';
 import { MdSpaceDashboard, MdHome, MdSettings, MdKeyboardArrowDown } from 'react-icons/md';
 import styles from './header.module.scss';
@@ -116,7 +116,7 @@ export const Header = () => {
     };
   }, [isMenuOpen]);
 
-  const data = useAppSelector(state => state.fullName);
+  const userData = useAppSelector(state => state.fullName);
 
   useLayoutEffect(() => {
     dispatch(getUserName());
@@ -398,7 +398,7 @@ export const Header = () => {
           onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
         >
           <p style={{ fontSize: 16, fontWeight: 600, color: '#000000' }}>
-            {data.name} {data.surname}
+            {userData.name} {userData.surname}
           </p>
 
           <MdKeyboardArrowDown
