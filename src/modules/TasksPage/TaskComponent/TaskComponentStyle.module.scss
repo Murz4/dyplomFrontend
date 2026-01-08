@@ -5,6 +5,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding-bottom: 10px;
 
   &__containerPrimary {
     max-width: 436px;
@@ -54,8 +55,16 @@
     background-color: #97e142;
   }
 
-  &__headerUrgently {
-    background-color: #ef9bcf;
+  &__headerOverdue {
+    background-color: #ff5252;
+  }
+
+  &__headerCompleted {
+    background-color: #64b5f6;
+  }
+
+  &__headerUpcoming {
+    background-color: #ba68c8;
   }
 
   &__content {
@@ -78,5 +87,39 @@
   &__title {
     font-weight: 700;
     font-size: 20px;
+    color: #333;
   }
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #999;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.observerTrigger {
+  height: 20px;
+  width: 100%;
 }

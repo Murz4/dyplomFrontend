@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import apiClient from 'src/api/instances';
 
-type IItems = {
+export type IItems = {
   id: number;
   name: string;
   description?: string;

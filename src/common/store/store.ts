@@ -5,6 +5,9 @@ import forgotPasswordReducer from './slicer/forgotPasswordSlice';
 import getProjectsReducer from './slicer/getProjectsSlice';
 import projectDataReducer from './slicer/projectDataSlice';
 import getUserNameReducer from './slicer/fullNameSlice';
+import getTasksReducer from './slicer/getTasksSlice';
+import taskReducer from './slicer/taskSlice';
+import getProjectTasksReducer from './slicer/getProjectTasksSlice';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -13,6 +16,9 @@ const rootReducer = combineReducers({
   forgotPassword: forgotPasswordReducer,
   projects: getProjectsReducer,
   fullName: getUserNameReducer,
+  getTasks: getTasksReducer,
+  task: taskReducer,
+  projectTasks: getProjectTasksReducer,
 });
 
 export const store = configureStore({

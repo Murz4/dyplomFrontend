@@ -109,6 +109,138 @@
       background-color: #b8c0dd;
     }
   }
+
+  &__optionDisabled {
+    color: #aaa;
+    cursor: not-allowed;
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #666;
+    gap: 10px;
+  }
+
+  &__loadingMore {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    color: #888;
+    font-size: 14px;
+    gap: 8px;
+  }
+
+  &__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  &__spinnerSmall {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+.whiteVariant {
+  .customSelect__trigger {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+
+    &:hover {
+      background-color: #f5f5f5;
+      border-color: #d0d0d0;
+    }
+  }
+
+  .customSelect__placeholder {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  .customSelect__selected {
+    color: #333;
+  }
+
+  .customSelect__arrow {
+    color: #666;
+  }
+
+  .customSelect__dropdown {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    &::-webkit-scrollbar-track {
+      background: #f5f5f5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d0d0d0;
+
+      &:hover {
+        background: #b0b0b0;
+      }
+    }
+  }
+
+  .customSelect__option {
+    color: #333;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+
+  .customSelect__optionSelected {
+    background-color: #e8eaf6;
+    color: #5d78e6;
+
+    &:hover {
+      background-color: #d1d5f0;
+    }
+  }
+
+  .customSelect__optionDisabled {
+    color: #bbb;
+  }
+
+  .customSelect__loading {
+    color: #888;
+  }
+
+  .customSelect__loadingMore {
+    color: #999;
+  }
+
+  .customSelect__spinner {
+    border-color: #e0e0e0;
+    border-top-color: #5d78e6;
+  }
+
+  .customSelect__spinnerSmall {
+    border-color: #e0e0e0;
+    border-top-color: #5d78e6;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {

@@ -5,18 +5,28 @@ import styles from './customSelectStyle.module.scss';
 
 interface CustomSelectProps {
   name: string;
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: number | string; label: string; disabled?: boolean }>;
   placeholder?: string;
+  isLoading?: boolean;
+  loadingMessage?: string;
+  variant?: 'blue' | 'white';
 }
 
-export const CustomSelect = ({ name, options, placeholder = 'Select option' }: CustomSelectProps) => {
+export const CustomSelect = ({
+  name,
+  options,
+  placeholder = 'Select option',
+  isLoading = false,
+  loadingMessage = 'Loading...',
+  variant = 'blue',
+}: CustomSelectProps) => {
   const [field, meta, helpers] = useField(name);
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find(opt => opt.value === field.value);
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: number | string) => {
     helpers.setValue(value);
     setIsOpen(false);
   };
@@ -39,7 +49,7 @@ export const CustomSelect = ({ name, options, placeholder = 'Select option' }: C
   }, []);
 
   return (
-    <div className={styles.customSelect} ref={selectRef}>
+    <div className={`${styles.customSelect} ${variant === 'white' ? styles.whiteVariant : ''}`} ref={selectRef}>
       <div
         className={`${styles.customSelect__trigger} ${
           meta.error && meta.touched ? styles.customSelect__triggerError : ''
@@ -54,19 +64,37 @@ export const CustomSelect = ({ name, options, placeholder = 'Select option' }: C
           size={20}
         />
       </div>
+
       {isOpen && (
         <div className={styles.customSelect__dropdown}>
-          {options.map(option => (
-            <div
-              key={option.value}
-              className={`${styles.customSelect__option} ${
-                field.value === option.value ? styles.customSelect__optionSelected : ''
-              }`}
-              onClick={() => handleSelect(option.value)}
-            >
-              {option.label}
+          {isLoading && options.length === 0 ? (
+            <div className={styles.customSelect__loading}>
+              <div className={styles.customSelect__spinner} />
+              <span>{loadingMessage}</span>
             </div>
-          ))}
+          ) : (
+            <>
+              {options.map(option => (
+                <div
+                  key={option.value}
+                  className={`${styles.customSelect__option} ${
+                    field.value === option.value ? styles.customSelect__optionSelected : ''
+                  } ${option.disabled ? styles.customSelect__optionDisabled : ''}`}
+                  onClick={() => !option.disabled && handleSelect(option.value)}
+                  style={option.disabled ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+                >
+                  {option.label}
+                </div>
+              ))}
+
+              {isLoading && options.length > 0 && (
+                <div className={styles.customSelect__loadingMore}>
+                  <div className={styles.customSelect__spinnerSmall} />
+                  <span>Loading more...</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

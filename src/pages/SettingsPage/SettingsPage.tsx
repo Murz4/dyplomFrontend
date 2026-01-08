@@ -157,7 +157,7 @@ export const SettingsPage = () => {
           <span className={styles.container__settingsItemArrow}>→</span>
         </div>
 
-        <div
+        {/* <div
           className={styles.container__settingsItem}
           onClick={() => setActiveSection('email')}
           role='button'
@@ -166,7 +166,7 @@ export const SettingsPage = () => {
         >
           <span className={styles.container__settingsItemLabel}>Change Email</span>
           <span className={styles.container__settingsItemArrow}>→</span>
-        </div>
+        </div> */}
 
         <div
           className={styles.container__settingsItem}

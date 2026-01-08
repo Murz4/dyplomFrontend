@@ -9,6 +9,7 @@ import { ProjectSettings } from '@modules/main/ProjectSettings/ProjectSettings';
 import { setProject } from '@common/store/slicer/projectDataSlice';
 import toast from 'react-hot-toast';
 import { postJoinByCode } from 'src/api/postJoinByCode';
+import { useNavigate } from 'react-router-dom';
 
 export const MainPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +22,7 @@ export const MainPage = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observerTarget = useRef(null);
   const hasInitialized = useRef(false);
+  const navigate = useNavigate();
 
   const filteredProjectsArray = projects.items.filter(item => item.is_archived === false);
   const currentProject = useAppSelector(state => state.projectData.projectId);
@@ -155,7 +157,7 @@ export const MainPage = () => {
   }, [projects.hasMore, projects.loading, projects.nextCursor, isLoadingMore, loadMoreProjects]);
 
   const handleClickProject = (index: number) => {
-    console.log(index);
+    navigate(`tasks/${index}`);
   };
 
   const handleClickParticipants = async (index: number, name: string) => {
@@ -250,13 +252,13 @@ export const MainPage = () => {
         <div className={styles.container__headerMain}>
           <p className={styles.container__text}>Projects</p>
           <p className={styles.container__text} style={{ textDecoration: 'underline', marginTop: 2 }}>
-            {filteredProjectsArray.length}
+            {projects.total}
           </p>
         </div>
-        {filteredProjectsArray.map((item, index) => (
+        {filteredProjectsArray.map(item => (
           <ProjectComponent
             onClickUsers={() => handleClickParticipants(item.id, item.name)}
-            onClick={() => handleClickProject(index)}
+            onClick={() => handleClickProject(item.id)}
             creatorName={item.creator.name}
             creatorSurname={item.creator.surname}
             onClickSettings={() => handleClickSettings(item.id, item.name)}

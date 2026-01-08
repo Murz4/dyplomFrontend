@@ -1,47 +1,100 @@
-import { ReactNode } from 'react';
-import { IoAddOutline } from 'react-icons/io5';
-
+import { ReactNode, useEffect, useRef } from 'react';
 import styles from './TaskComponentStyle.module.scss';
 
-interface ITaskComponentProps {
-  taskType: 'today' | 'week' | 'urgently';
+interface TaskComponentProps {
+  taskType: 'today' | 'week' | 'overdue' | 'completed' | 'upcoming';
   children: ReactNode;
+  hasMore?: boolean;
+  loading?: boolean;
+  onLoadMore?: () => void;
 }
 
 const TASK_CONFIG = {
   today: {
     label: 'Today',
-    header: styles.container__headerToday,
-    containerType: styles.container__containerPrimary,
-    contentType: styles.container__contentPrimary,
+    headerClass: styles.container__headerToday,
+    containerClass: styles.container__containerPrimary,
+    contentClass: styles.container__contentPrimary,
   },
   week: {
-    label: 'Week',
-    header: styles.container__headerWeek,
-    containerType: styles.container__containerSecondary,
-    contentType: styles.container__contentSecondary,
+    label: 'This Week',
+    headerClass: styles.container__headerWeek,
+    containerClass: styles.container__containerSecondary,
+    contentClass: styles.container__contentSecondary,
   },
-  urgently: {
-    label: 'Urgently',
-    header: styles.container__headerUrgently,
-    containerType: styles.container__containerPrimary,
-    contentType: styles.container__contentPrimary,
+  overdue: {
+    label: 'Overdue',
+    headerClass: styles.container__headerOverdue,
+    containerClass: styles.container__containerPrimary,
+    contentClass: styles.container__contentPrimary,
+  },
+  completed: {
+    label: 'Completed',
+    headerClass: styles.container__headerCompleted,
+    containerClass: styles.container__containerPrimary,
+    contentClass: styles.container__contentPrimary,
+  },
+  upcoming: {
+    label: 'Upcoming',
+    headerClass: styles.container__headerUpcoming,
+    containerClass: styles.container__containerSecondary,
+    contentClass: styles.container__contentSecondary,
   },
 } as const;
 
-export const TaskComponent = ({ taskType, children }: ITaskComponentProps) => {
+export const TaskComponent = ({
+  taskType,
+  children,
+  hasMore = false,
+  loading = false,
+  onLoadMore,
+}: TaskComponentProps) => {
   const config = TASK_CONFIG[taskType];
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!onLoadMore || !hasMore) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !loading) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [onLoadMore, hasMore, loading]);
 
   return (
-    <div className={`${styles.container} ${config.containerType}`}>
-      <div className={`${styles.container__headerWrapper} ${config.header}`}>
+    <div className={`${styles.container} ${config.containerClass}`}>
+      <div className={`${styles.container__headerWrapper} ${config.headerClass}`}>
         <p className={styles.container__title}>{config.label}</p>
-        <IoAddOutline size={35} />
       </div>
+
       <div className={styles.container__main}>
-        <div className={`${styles.container__content} ${config.contentType}`}>
+        <div className={`${styles.container__content} ${config.contentClass}`}>
           {children}
-          <div />
+
+          {loading && (
+            <div className={styles.loadingContainer}>
+              <div className={styles.spinner} />
+              <p>Loading more...</p>
+            </div>
+          )}
+
+          {hasMore && !loading && <div ref={observerTarget} className={styles.observerTrigger} />}
         </div>
       </div>
     </div>
