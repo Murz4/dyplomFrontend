@@ -91,7 +91,6 @@ export const TaskModal: React.FC<TaskModalProps & { currentDate: Date }> = ({
   task: initialTask,
   loading,
   error,
-  apiEndpoint = '/api',
   currentDate,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
