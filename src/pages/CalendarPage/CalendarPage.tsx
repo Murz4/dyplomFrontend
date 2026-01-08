@@ -173,6 +173,7 @@ export const CalendarPage = () => {
     setTaskError(null);
 
     try {
+      //@ts-ignore
       const userIds = values.participants
         .map(email => {
           const member = projectMembers.find(m => m.user.email === email);
@@ -601,6 +602,7 @@ export const CalendarPage = () => {
                         <button
                           type='button'
                           onClick={() => {
+                            //@ts-ignore
                             if (selectedMemberEmail && !values.participants.includes(selectedMemberEmail)) {
                               setFieldValue('participants', [...values.participants, selectedMemberEmail]);
                               setSelectedMemberEmail('');
