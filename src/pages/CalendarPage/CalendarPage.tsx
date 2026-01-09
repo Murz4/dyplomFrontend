@@ -209,11 +209,10 @@ export const CalendarPage = () => {
         users: userIds,
         without_time: Boolean(values.isOneDayTask),
       };
-      // @ts-ignore
-      await postTask(payload as any);
+      const createdTask = await postTask(payload as any);
 
       const optimisticTask = {
-        task_id: Date.now(),
+        task_id: createdTask.task_id,
         project_id: Number(values.selectedProject),
         name: values.taskName,
         description: values.description || '',

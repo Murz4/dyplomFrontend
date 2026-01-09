@@ -23,7 +23,7 @@ export const Calendar = ({ currentDate }: { currentDate: Date; setCurrentDate: (
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log(selectedTask?.id);
+    console.log('id', selectedTask?.id);
   }, [selectedTask]);
 
   const getPriorityText = (priorityId: number): string => {
