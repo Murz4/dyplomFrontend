@@ -5,11 +5,9 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
 export default defineConfig([
-  // Глобальное игнорирование файлов
   {
     ignores: ['dist/**', 'build/**', 'node_modules/**'],
   },
-  // Основная конфигурация
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {

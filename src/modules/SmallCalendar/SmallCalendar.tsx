@@ -21,7 +21,6 @@ export const SmallCalendar = ({ currentDate, setCurrentDate }) => {
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDay = getFirstDayOfMonth(currentDate);
 
-    // PrevMonth
     const prevMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
     const daysInPrevMonth = getDaysInMonth(prevMonthDate);
     for (let i = firstDay - 1; i >= 0; i--) {
@@ -33,7 +32,6 @@ export const SmallCalendar = ({ currentDate, setCurrentDate }) => {
       );
     }
 
-    // CurrentMonth
     for (let i = 1; i <= daysInMonth; i++) {
       const isToday =
         i === today.getDate() &&
@@ -47,7 +45,6 @@ export const SmallCalendar = ({ currentDate, setCurrentDate }) => {
       );
     }
 
-    // NextMonth
     const totalCells = days.length;
     const remainingCells = 42 - totalCells;
     for (let i = 1; i <= remainingCells; i++) {
